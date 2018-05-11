@@ -23,7 +23,7 @@ export default new Router({
         },
         {
           path: 'cmp2',
-          component: cmp2
+          component: cmp2,
         }
       ]
     },

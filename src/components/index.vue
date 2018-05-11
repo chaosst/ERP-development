@@ -198,6 +198,11 @@
           $pop[i].style["display"] = "none";
         }
       },
+    },
+    mounted:function(){
+      if(this.tabs.length == 1){
+        this.$router.push("/main/index");
+      }
     }
   }
 </script>
