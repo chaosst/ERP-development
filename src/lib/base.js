@@ -45,6 +45,24 @@ var commonTemp = {
 }
 var fantVueCommon = {};
 fantVueCommon.install = function (Vue, options) {
+  Vue.arrayRemove = function(arr, val){
+    var index = arr.indexOf(val);
+    if (index > -1) {
+      arr.splice(index, 1);
+    }
+  }
+  Vue.indexOfArray = function(arr, obj) {
+    var index = null;
+    var key = Object.keys(obj)[0];
+    arr.every(function(value, i) {
+      if (value[key] === obj[key]) {
+        index = i;
+        return false;
+      }
+      return true;
+    });
+    return index;
+  }
   Vue.encode=function (input) {
     var output = "";
     var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
@@ -268,6 +286,12 @@ fantVueCommon.install = function (Vue, options) {
     return Array.of.apply(Array, arguments);
   }
   /**
+   * 将类数组转为数组
+   */
+  Vue.fromArray = function () {
+    return Array.from.apply(Array, arguments);
+  }
+  /**
    * 判断数字是否整数
    */
   Vue.isInteger = function (num) {
@@ -320,6 +344,21 @@ fantVueCommon.install = function (Vue, options) {
                   if(inputs[next]){
                     //延迟聚焦下一个input，修复选择组件回车不聚焦下一个input的问题
                     setTimeout(function(){
+                      if(item.vueEl){
+                        if(item.vueEl.$el.className.indexOf("el-date-editor")!= -1){//修复日期控件回车后不选择下拉框不消失的问题
+                          var today = Vue.fromArray(Vue.getEl(".today"));
+                          for(let item of today.values()){
+                            var a = item.closest(".el-date-picker");
+                            if(a.isHidden()){
+                              continue;
+                            }
+                            item.click();
+                            break;
+                          }
+                        }
+                        item.vueEl.$children[0].blur();
+                        item.blur();
+                      }
                       if(inputs[next].vueEl){
                         inputs[next].vueEl.$children[0].focus();
                       }else{
@@ -349,7 +388,7 @@ fantVueCommon.install = function (Vue, options) {
   Vue.mixin({
     methods:{
       formatDate(row, column, cellValue){
-        formatStr = "yyyy-MM-dd"; //默认格式
+        var formatStr = "yyyy-MM-dd"; //默认格式
         var dateReg = /^([0-9]{4})[-/\.年]([0-1]?[0-9]{1})[-/\.月]([0-3]?[0-9]{1})[日]?.?([0-2]?[0-9](:[0-6][0-9]){2})?/;
         var arr = dateReg.exec(cellValue);
         if (arr && arr[0]) {
@@ -366,6 +405,12 @@ fantVueCommon.install = function (Vue, options) {
           return arr[0];
         }
         return "";
+      },
+      unFormatMoney:function(value){
+        if(String(value).indexOf(",")!=-1){
+          value = String(value).replace(/,/g, '');
+        }
+        return value;
       },
       formatMoney:function(value, places){
         if(!value){
@@ -385,8 +430,8 @@ fantVueCommon.install = function (Vue, options) {
         var decimal = String(value).split('.')[1] || '';//小数部分
         var tempArr = [];
         var revNumArr = String(value).split('.')[0].split("").reverse();//倒序
-        for (var i in revNumArr){
-          tempArr.push(revNumArr[i]);
+        for (var [i, val] of revNumArr.entries()){
+          tempArr.push(val);
           if((i+1)%3 === 0 && i != revNumArr.length-1){
             tempArr.push(',');
           }

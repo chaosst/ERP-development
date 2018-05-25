@@ -46,7 +46,7 @@
               <el-card class="box-card">
                 <div slot="header" class="clearfix">
                   <span>登录</span>
-                  <el-button style="float: right; padding: 3px 0" type="text" @click="signIn">注册</el-button>
+                  <el-button style="float: right; padding: 3px 0" type="text" @click="signUp">注册</el-button>
                 </div>
                 <div>
                   <f-form :model="fdata" :opt="formOpt" ref="loginForm" id="loginForm" v-enter style="float:left;">
@@ -117,10 +117,10 @@
         });
       },
       forgetPw(){
-        //todo:
+        this.$router.push("/forgetPwd");
       },
-      signIn(){
-        //todo:
+      signUp(){
+        this.$router.push("/register");
       },
       createCode(){
         var code = "";

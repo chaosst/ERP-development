@@ -16,6 +16,9 @@
       }
     },
     methods:{
+    },
+    mounted(){
+      window.$vueEl = this;
     }
   }
 </script>

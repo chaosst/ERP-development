@@ -1,4 +1,313 @@
 import Vue from 'vue';
+function keyHandler(target){
+  if(!target){
+    return false;
+  }
+  var selected="";
+  var row="";
+  var index="";
+  var field="";
+  var panel="";
+  var id=target.id;
+  panel=target.getElementsByClassName("el-table__body")[0];
+  Vue.fromArray(panel.getElementsByTagName("input")).forEach(function(item, index){
+    if(item.focusEvent){
+      item.removeEventListener("focus",item.focusEvent)
+    }
+    item.addEventListener("focus",item.focusEvent = function(e){
+      selected=this;
+      row=this.closest("tr");
+    });
+  });
+  if(panel.keydownEvent){
+    panel.removeEventListener("keydown",panel.keydownEvent);
+  }
+  panel.addEventListener("keydown",panel.keydownEvent = function(e){
+    switch (e.keyCode) {
+      case 37: // left
+        if(selected){
+          var ed="";
+          ed=getLastField(row,target,selected);
+          if(ed){
+              var input = ed.getElementsByTagName("input");
+              //延迟聚焦下一个input，修复选择组件回车不聚焦下一个input的问题
+              setTimeout(function(){
+                if(selected.vueEl){
+                  if(selected.vueEl.$el.className.indexOf("el-date-editor")!= -1){//修复日期控件回车后不选择下拉框不消失的问题
+                    var today = Vue.fromArray(Vue.getEl(".today"));
+                    for(let item of today.values()){
+                      var a = item.closest(".el-date-picker");
+                      if(a.isHidden()){
+                        continue;
+                      }
+                      item.click();
+                      break;
+                    }
+                  }
+                  selected.vueEl.$children[0].blur();
+                  selected.blur();
+                }
+                if(input.length>0 && input[0].vueEl){
+                  input[0].vueEl.$children[0].focus();
+                }else if(input.length>0){
+                  input[0].focus();
+                }
+              },100);
+          }
+        }
+        break;
+
+      case 38: // up
+        if(selected){
+          var ed="";
+          ed=getUpField(row,target,selected);
+          if(ed){
+            var input = ed.getElementsByTagName("input");
+            //延迟聚焦下一个input，修复选择组件回车不聚焦下一个input的问题
+            setTimeout(function(){
+              if(selected.vueEl){
+                if(selected.vueEl.$el.className.indexOf("el-select")!= -1 || selected.vueEl.$el.className.indexOf("el-cascader")!= -1 || selected.vueEl.$el.className.indexOf("el-date-editor")!= -1){
+                  return false;
+                }
+                selected.vueEl.$children[0].blur();
+                selected.blur();
+              }
+              if(input.length>0 && input[0].vueEl){
+                input[0].vueEl.$children[0].focus();
+              }else if(input.length>0){
+                input[0].focus();
+              }
+            },100);
+          }
+        }
+        break;
+
+      case 39: // right
+        if(selected){
+          var ed="";
+          ed=getNextField(row,target,selected);
+          if(ed){
+            var input = ed.getElementsByTagName("input");
+            //延迟聚焦下一个input，修复选择组件回车不聚焦下一个input的问题
+            setTimeout(function(){
+              if(selected.vueEl){
+                if(selected.vueEl.$el.className.indexOf("el-date-editor")!= -1){//修复日期控件回车后不选择下拉框不消失的问题
+                  var today = Vue.fromArray(Vue.getEl(".today"));
+                  for(let item of today.values()){
+                    var a = item.closest(".el-date-picker");
+                    if(a.isHidden()){
+                      continue;
+                    }
+                    item.click();
+                    break;
+                  }
+                }
+                selected.vueEl.$children[0].blur();
+                selected.blur();
+              }
+              if(input.length>0 && input[0].vueEl){
+                input[0].vueEl.$children[0].focus();
+              }else if(input.length>0){
+                input[0].focus();
+              }
+            },100);
+          }
+        }
+        break;
+      case 40: // down
+        if(selected){
+          var ed="";
+          ed=getDownField(row,target,selected);
+          if(ed){
+            var input = ed.getElementsByTagName("input");
+            //延迟聚焦下一个input，修复选择组件回车不聚焦下一个input的问题
+            setTimeout(function(){
+              if(selected.vueEl){
+                if(selected.vueEl.$el.className.indexOf("el-select")!= -1 || selected.vueEl.$el.className.indexOf("el-cascader")!= -1 || selected.vueEl.$el.className.indexOf("el-date-editor")!= -1){
+                  return false;
+                }
+                selected.vueEl.$children[0].blur();
+                selected.blur();
+              }
+              if(input.length>0 && input[0].vueEl){
+                input[0].vueEl.$children[0].focus();
+              }else if(input.length>0){
+                input[0].focus();
+              }
+            },100);
+          }
+        }
+        break;
+      case 13: // enter 需求变更
+        if(selected){
+          var ed="";
+          ed=getNextField(row,target,selected);
+          if(ed){
+            var input = ed.getElementsByTagName("input");
+            //延迟聚焦下一个input，修复选择组件回车不聚焦下一个input的问题
+            setTimeout(function(){
+              if(selected.vueEl){
+                if(selected.vueEl.$el.className.indexOf("el-date-editor")!= -1){//修复日期控件回车后不选择下拉框不消失的问题
+                  var today = Vue.fromArray(Vue.getEl(".today"));
+                  for(let item of today.values()){
+                    var a = item.closest(".el-date-picker");
+                    if(a.isHidden()){
+                      continue;
+                    }
+                    item.click();
+                    break;
+                  }
+                }
+                selected.vueEl.$children[0].blur();
+                selected.blur();
+              }
+              if(input.length>0 && input[0].vueEl){
+                input[0].vueEl.$children[0].focus();
+              }else if(input.length>0){
+                input[0].focus();
+              }
+            },100);
+          }
+        }
+        break;
+    }
+  });
+}
+
+//获取指定行的编辑列
+function getEdFields(row){
+  if(row){
+    var tds=row.getElementsByTagName("td");
+    var edFields=[];
+    Vue.fromArray(tds).forEach(function(item, index){
+      if(item.getElementsByTagName("input").length > 0){
+        edFields.push(item);
+      }
+    });
+    return edFields;
+  }
+}
+//获取下一个编辑框
+//参数 target:列表对象
+function getNextField(row,target,selected){
+  var result="";
+  var listTarget="";
+  if(!target){
+    return false;
+  }
+  listTarget=target;
+  var edFields=getEdFields(row);
+  var selected_ = selected.closest("td");
+  for(var i in edFields){
+    var item = edFields[i];
+    var index = parseInt(i);
+    if(item === selected_ && index+1<edFields.length){
+      result=edFields[index+1];
+      if(!result){
+        return false;
+      }
+      if(result.getAttribute("disabled") && (result.getAttribute("disabled")=='disabled'|| result.getAttribute("disabled")==true)){
+        result=getLastField(row,result);
+      }
+      return result;
+    }else if(item === selected_ && i+1>=edFields.length){
+      var nextRow=row.nextSibling.length!=0?row.nextSibling:null;
+      var fields="";
+      if(nextRow){
+        fields=getEdFields(nextRow);
+        result=fields[0];
+        if(result.getAttribute("disabled") && (result.getAttribute("disabled")=='disabled'|| result.getAttribute("disabled")==true)){
+          result=getLastField(nextRow,result);
+        }
+        return result;
+      }
+    }
+  }
+}
+//获取上一个编辑框
+//参数 target:列表对象
+function getLastField(row,target,selected){
+  var edFields=getEdFields(row);
+  var result="";
+  var listTarget="";
+  if(!target){
+    return false;
+  }
+  listTarget=target;
+  var selected_ = selected.closest("td");
+  for(var i in edFields){
+    var item = edFields[i];
+    var index = parseInt(i);
+    if(item === selected_ && index-1>=0){
+      result=edFields[index-1];
+      if(result.getAttribute("disabled") && (result.getAttribute("disabled")=='disabled'|| result.getAttribute("disabled")==true)){
+        result=getLastField(row,result);
+      }
+      return result;
+    }else if(item === selected_ && index-1<0){
+      var lastRow=row.previousSibling;
+      var fields="";
+      if(lastRow){
+        fields=getEdFields(lastRow);
+        result=fields[fields.length-1];
+        if(result.getAttribute("disabled") && (result.getAttribute("disabled")=='disabled'|| result.getAttribute("disabled")==true)){
+          result=getLastField(lastRow,result);
+        }
+        return result;
+      }
+    }
+  }
+}
+//获取上一行编辑框
+//参数 target:列表对象
+function getUpField(row,target,selected){
+  var edFields=getEdFields(row);
+  var selected_ = selected.closest("td");
+  var oindex = Vue.indexOfArray(edFields,selected_);
+  var lastRow="";
+  var fields="";
+  var listTarget="";
+  if(!target){
+    return false;
+  }
+  listTarget=target;
+  lastRow = row;
+  while(lastRow.previousSibling){
+    lastRow = lastRow.previousSibling;
+    if(lastRow.getElementsByTagName("input").length==0){
+      lastRow.getElementsByClassName("editBtn")[0].click();
+    }
+    fields=getEdFields(lastRow);
+    if(fields&&fields.length>0){
+      return fields[oindex];
+    }
+  }
+}
+//获取下一行编辑框
+//参数 target:列表对象
+function getDownField(row,target,selected){
+  var edFields=getEdFields(row);
+  var selected_ = selected.closest("td");
+  var oindex = Vue.indexOfArray(edFields,selected_);
+  var listTarget="";
+  if(!target){
+    return false;
+  }
+  listTarget=target;
+  var nextRow="";
+  var fields="";
+  nextRow = row;
+  while(nextRow.nextSibling.length != 0){
+    nextRow = nextRow.nextSibling;
+    if(nextRow.getElementsByTagName("input").length==0){
+      nextRow.getElementsByClassName("editBtn")[0].click();
+    }
+    fields=getEdFields(nextRow);
+    if(fields&&fields.length>0){
+      return fields[oindex];
+    }
+  }
+}
 /*
  * element框架的封装js
  */
@@ -85,7 +394,7 @@ var elementTemp = {
         elDialog.getElementsByClassName("el-dialog__body")[0].style.overflow = "auto";
       },300);
     },
-    template:'<el-dialog ref="elWin" :title="opt.title" @open="open" @close="close" :close-on-click-modal="opt.closeonclickmodal" :close-on-press-escape="opt.closeonpressescape" :visible.sync="visible" :fullscreen="opt.fullscreen" :width="opt.width" :before-close="handleClose"><span slot="title" class="dialog-title"><slot name="title"></slot></span><slot></slot><span v-if="opt.footer" slot="footer" class="dialog-footer"><slot name="footer"></slot></span></el-dialog>',
+    template:'<el-dialog ref="elWin" :title="opt.title" @open="open" @close="close" :modal-append-to-body="opt.modalAppendToBody" :close-on-click-modal="opt.closeonclickmodal" :close-on-press-escape="opt.closeonpressescape" :visible.sync="visible" :fullscreen="opt.fullscreen" :width="opt.width" :before-close="handleClose"><span slot="title" class="dialog-title"><slot name="title"></slot></span><slot></slot><span v-if="opt.footer" slot="footer" class="dialog-footer"><slot name="footer"></slot></span></el-dialog>',
   }	,
   //日期下拉选择框封装
   dateDom : {
@@ -151,7 +460,6 @@ var elementTemp = {
     },
     watch:{
       value:function(){
-        console.log("watch:"+this.value)
         this.mytime = this.value;
       }
     },
@@ -182,10 +490,11 @@ var elementTemp = {
       }
     },
     mounted:function(){
+      var $input = this.$el.getElementsByTagName("input")[0];
       //将vue对象绑定在input里面
       $input.vueEl = this;
     },
-    template:'<el-date-picker v-model="mytime" @blur="blur" @focus="focus" @change="updateValue" :readonly="opt.readonly" :disabled="opt.disabled" :editable="opt.editable" :type="opt.type" :placeholder="opt.prompt" :clearable="opt.clearable" :size="opt.size" :format="opt.format" :popper-class="opt.popperClass" :picker-options="opt.pickerOptions" :default-value="opt.defaultValue" :clear-icon="opt.clearIcon" :prefix-icon="opt.prefixIcon" :value-format="opt.valueFormat" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>'
+    template:'<el-date-picker :style="{width:opt.width,height:opt.height}" v-model="mytime" @blur="blur" @focus="focus" @change="updateValue" :readonly="opt.readonly" :disabled="opt.disabled" :editable="opt.editable" :type="opt.type" :placeholder="opt.prompt" :clearable="opt.clearable" :size="opt.size?opt.size:\'small\'" :format="opt.format" :popper-class="opt.popperClass" :picker-options="opt.pickerOptions" :default-value="opt.defaultValue" :clear-icon="opt.clearIcon" :prefix-icon="opt.prefixIcon" :value-format="opt.valueFormat" range-separator="至" start-placeholder="开始日期" end-placeholder="结束日期"></el-date-picker>'
   },
   //级联下拉选择框封装
   cascaderDom : {
@@ -206,7 +515,9 @@ var elementTemp = {
       },
       value:{
         type: Array,
-        default:[]
+        default:function(){
+          return [];
+        }
       }
     },
     watch:{
@@ -251,7 +562,7 @@ var elementTemp = {
       //设置url后，data会失效
       this.reloadData();
     },
-    template:'<el-cascader :options="opt.data" v-model="myvalue" :props="opt.props" :popper-class="opt.popperClass" :placeholder="opt.prompt" :disabled="opt.disabled" :clearable="opt.clearable" :expand-trigger="opt.expandTrigger" :show-all-levels="opt.showAllLevels" :filterable="opt.filterable" :change-on-select="opt.changeOnSelect" :size="opt.size" :before-filter="beforeFilter" @change="change" @active-item-change="activeItemChange" @blur="blur" @focus="focus"></el-cascader>'
+    template:'<el-cascader :style="{width:opt.width,height:opt.height}" :options="opt.data" v-model="myvalue" :props="opt.props" :popper-class="opt.popperClass" :placeholder="opt.prompt" :disabled="opt.disabled" :clearable="opt.clearable" :expand-trigger="opt.expandTrigger" :show-all-levels="opt.showAllLevels" :filterable="opt.filterable" :change-on-select="opt.changeOnSelect" :size="opt.size?opt.size:\'small\'" :before-filter="beforeFilter" @change="change" @active-item-change="activeItemChange" @blur="blur" @focus="focus"></el-cascader>'
   },
   //下拉选择框封装
   selectDom : {
@@ -344,7 +655,7 @@ var elementTemp = {
         }
       }
       var opt_ = {
-        width:typeof s.width == "string"?s.width:typeof s.width == "number"?s.width+"px":200,
+        width:typeof s.width == "string"?s.width:typeof s.width == "number"?s.width+"px":null,
         filterable:typeof s.filterable != "undefined"?s.filterable:true,
       };
       Object.assign(this.opt, this.opt, opt_);
@@ -358,14 +669,16 @@ var elementTemp = {
       //将vue对象绑定在input里面
       $input.vueEl = this;
     },
-    template:'<el-select :disabled="opt.disabled" :style="{width : opt.width}" :name="opt.name" :remote="opt.remote" :clearable="opt.clearable" size="opt.size" :value="value" @change="change" @focus="focus" @blur="blur"  @visible-change="visibleChange" @remove-tag="removeTag" @clear="clear" @input="updateValue" :multiple="opt.multiple" popper-class="selectMain" :filterable="opt.filterable" :filter-method="localSearch" :remote-method="remoteSearch" :placeholder="opt.prompt"><el-option :disabled="true" value="0"><span v-for="val in opt.columns" :style="{ display: \'inline-block\',width: val.width + \'%\' }">{{val.name}}</span></el-option><el-option :disabled="item.disabled" v-for="item in opt.data" :label="item[opt.textField]" :value="item[opt.idField]"><span :style="{ display: \'inline-block\',width: val.width + \'%\' }" v-for="val in opt.columns">{{item[val.key]}}</span></el-option></el-select>',
+    template:'<el-select :disabled="opt.disabled" :style="{width:opt.width,height:opt.height}" :name="opt.name" :remote="opt.remote" :clearable="opt.clearable" :size="opt.size?opt.size:\'small\'" :value="value" @change="change" @focus="focus" @blur="blur"  @visible-change="visibleChange" @remove-tag="removeTag" @clear="clear" @input="updateValue" :multiple="opt.multiple" popper-class="selectMain" :filterable="opt.filterable" :filter-method="localSearch" :remote-method="remoteSearch" :placeholder="opt.prompt"><el-option :disabled="true" value="0"><span v-for="val in opt.columns" :style="{ display: \'inline-block\',width: val.width + \'%\' }">{{val.name}}</span></el-option><el-option :disabled="item.disabled" v-for="item in opt.data" :label="item[opt.textField]" :value="item[opt.idField]"><span :style="{ display: \'inline-block\',width: val.width + \'%\' }" v-for="val in opt.columns">{{item[val.key]}}</span></el-option></el-select>',
   },
   //form封装
   formDom : {
     props: {
       opt: {
         type: Object,
-        default:{}
+        default:function(){
+          return {};
+        }
       },
       model:{
         type: Object
@@ -382,22 +695,54 @@ var elementTemp = {
         this.opt.labelWidth = this.opt.labelWidth?this.opt.labelWidth:"120px";
       }
     },
-    template:'<el-form :model="model" :label-position="opt.labelPosition" :label-width="opt.labelWidth" :rules="opt.rules" :inline="opt.inline" :label-suffix="opt.labelSuffix" :show-message="opt.showMessage" :inline-message="opt.inlineMessage" :status-icon="opt.statusIcon" :size="opt.size" @validate="validate"><slot></slot></el-form>'
+    mounted(){
+      this.$el.$vueEl = this;
+    },
+    template:'<el-form :model="model" :label-position="opt.labelPosition" :label-width="opt.labelWidth" :rules="opt.rules" :inline="opt.inline" :label-suffix="opt.labelSuffix" :show-aaa="opt.showMessage" :inline-message="opt.inlineMessage" :status-icon="opt.statusIcon" :size="opt.size?opt.size:\'small\'" @validate="validate"><slot></slot></el-form>'
   },
   //formItem封装
   formItemDom : {
     props: {
       opt: {
         type: Object,
-        default:{}
-      },
-      created:function(){
-        if(typeof this.opt === "object"){
-          this.opt.label = this.opt.label?this.opt.label:"";
+        default: function () {
+          return {};
         }
+      },
+    },
+    created:function(){
+      if(typeof this.opt === "object"){
+        this.opt.label = this.opt.label?this.opt.label:"";
       }
     },
-    template:'<el-form-item :label="opt.label" :prop="opt.prop" :label-width="opt.labelWidth" :required="opt.required" :rules="opt.rules" :error="opt.error" :show-message="opt.showMessage" :inline-message="opt.inlineMessage" :size="opt.size"><slot></slot></el-form-item>'
+    template:'<el-form-item :label="opt.label" :prop="opt.prop" :label-width="opt.labelWidth" :required="opt.required" :rules="opt.rules" :error="opt.error" :show-aaa="opt.showMessage" :inline-aaa="opt.inlineMessage" :size="opt.size?opt.size:\'small\'"><slot></slot></el-form-item>'
+  },
+  //用于表格的编辑行
+  tableFormDom : {
+    data:function(){
+      var vm = this;
+      var columns = this.$parent.$parent.$parent.columns;
+      var rules_={};
+      columns.map(function(i){
+        if(i.prop == vm.scope.column.property){
+          rules_[vm.prop] = i.rules?i.rules:[];
+        }
+      });
+      return {
+        rules: rules_
+      }
+    },
+    props: {
+      scope: {
+        type: Object,
+        required:true
+      },
+      prop:{
+        type:String,
+        required:true
+      }
+    },
+    template:'<f-form :model="scope.row" :class="\'row\'+scope.$index" :opt="{rules:rules,inlineMessage:true}"><el-form-item :prop="prop"><slot></slot></el-form-item></f-form>'
   },
   //table封装
   tableDom : {
@@ -424,7 +769,9 @@ var elementTemp = {
       },
       data:{
         type: Array,
-        default:[]
+        default:function(){
+          return [];
+        }
       }
     },
     methods:{
@@ -551,15 +898,6 @@ var elementTemp = {
             Vue.set(vm.page,"total",re[vm.dataProp.total]);
           }
         });
-      },
-      formatter:function(row, column, cellValue, index, i){
-        if(this.columns[i].formatter && typeof this.columns[i].formatter === "function"){
-          return this.columns[i].formatter(row, column, cellValue, index);
-        }else if(this.columns[i].money){
-          return this.formatMoney(cellValue);
-        }else{
-          return cellValue;
-        }
       }
     },
     created:function(){
@@ -575,7 +913,8 @@ var elementTemp = {
       }
       if(typeof this.opt == "object"){
         this.opt.width = typeof this.opt.width === "string" || typeof this.opt.width === "number"?this.opt.width:"100%";
-        this.opt.height = typeof this.opt.height === "string" || typeof this.opt.height === "number"?this.opt.height:"500px";
+        // this.opt.height = typeof this.opt.height === "string" || typeof this.opt.height === "number"?this.opt.height:"500px";
+        typeof this.opt.height === "number"?this.opt.height=this.opt.height+"px":null;
       }
     },
     mounted:function(){
@@ -583,8 +922,14 @@ var elementTemp = {
       if(this.opt.url && typeof this.opt.url === "string"){
         this.reloadGrid();
       }
+      if(this.$slots.append){
+        this.$el.getElementsByClassName("el-table__empty-block")[0].style.display="none";
+      }
     },
-    template:'<div><el-table ref="elTable" :sum-text="opt.sumText" tooltip-effect="dark" :cell-style="{overflow:\'hidden\'}" row-class-name="ops-table-row" cell-class-name="ops-table-cell" header-row-class-name="ops-table-header-row" header-cell-class-name="ops-table-header-cell" @select="select" @select-all="selectAll" @selection-change="selectionChange" @cell-mouse-enter="cellMouseEnter" @cell-mouse-leave="cellMouseLeave" @cell-click="cellClick" @cell-dblclick="cellDblclick" @row-click="rowClick" @row-contextmenu="rowContextmenu" @row-dblclick="rowDblclick" @sort-change="sortChange" @header-dragend="headerDragend" :data="mydata" size="medium" show-summary :summary-method="getSummaries" :highlight-current-row="true" border stripe :height="opt.height" :style="{width: opt.width}" @current-change="currentChange" min-height="700"><el-table-column v-if="opt.multiple" type="selection" width="55"></el-table-column><el-table-column v-for="(col, i) of columns" :type="col.type" :index="col.index" :resizable="col.resizable" align="center" header-align="center" :show-overflow-tooltip="true" :selectable="col.selectable" :reserve-selection="col.reserveSelection" :sort-by="col.sortBy" :prop="col.prop" :label="col.label" :fixed="col.fixed" :sortable="col.sortable" :min-width="col.minWidth" :width="col.width" :formatter="function(row, column, cellValue, index){return formatter(row, column, cellValue, index, i)}"><template slot-scope="scope"><slot :name="col.prop" :row="scope.row" :column="scope.column" :$index="scope.$index">{{col.formatter?col.formatter(scope.row, scope.column, scope.row[col.prop]):scope.row[col.prop]}}</slot></template></el-table-column></el-table><el-pagination v-if="opt.page" background layout="total, sizes, prev, pager, next, jumper, slot" @size-change="sizeChange" :current-page="page.currentPage" ref="elPage" :page-sizes="[10, 20, 30, 40]" :page-size="page.pageSize" :total="page.total" @next-click="nextClick" @prev-click="prevClick" @current-change="pageChange"><div slot style="display:inline-block;"><el-button v-if="page.ref" type="primary" @click="refresh" plain icon="el-icon-d-arrow-right"></el-button></div></el-pagination></div>'
+    updated:function(){
+      keyHandler(this.$el);
+    },
+    template:'<div class="fTable" :style="{height:opt.height,width:opt.width,position:\'relative\'}"><el-table ref="elTable" :sum-text="opt.sumText" tooltip-effect="dark" :cell-style="{overflow:\'hidden\'}" row-class-name="ops-table-row" cell-class-name="ops-table-cell" header-row-class-name="f-table-header-row" header-cell-class-name="f-table-header-cell" @select="select" @select-all="selectAll" @selection-change="selectionChange" @cell-mouse-enter="cellMouseEnter" @cell-mouse-leave="cellMouseLeave" @cell-click="cellClick" @cell-dblclick="cellDblclick" @row-click="rowClick" @row-contextmenu="rowContextmenu" @row-dblclick="rowDblclick" @sort-change="sortChange" @header-dragend="headerDragend" :data="mydata" :size="opt.size?opt.size:\'small\'" :show-summary="opt.showSummary" :summary-method="getSummaries" :highlight-current-row="true" :border="opt.border" stripe height="calc(100% - 32px)" :style="{width: opt.width}" @current-change="currentChange"><el-table-column v-if="opt.multiple" type="selection" width="55"></el-table-column><el-table-column v-for="(col, i) of columns" :type="col.type" :index="col.index" :resizable="col.resizable" align="center" header-align="center" :show-overflow-tooltip="true" :selectable="col.selectable" :reserve-selection="col.reserveSelection" :sort-by="col.sortBy" :prop="col.prop" :label="col.label" :fixed="col.fixed" :sortable="col.sortable" :min-width="col.minWidth" :width="col.width"><template slot-scope="scope"><slot :name="col.prop" :row="scope.row" :column="scope.column" :$index="scope.$index">{{col.formatter?col.formatter(scope.row, scope.column, scope.row[col.prop]):typeof col.money === "boolean"&&col.money?formatMoney(scope.row[col.prop]):scope.row[col.prop]}}</slot></template></el-table-column><div slot="append" v-if="$slots.append"><slot name="append"></slot></div></el-table><el-pagination v-if="opt.page" background layout="total, sizes, prev, pager, next, jumper, slot" @size-change="sizeChange" :current-page="page.currentPage" ref="elPage" :page-sizes="[10, 20, 30, 40]" :page-size="page.pageSize" :total="page.total" @next-click="nextClick" @prev-click="prevClick" @current-change="pageChange"><div slot style="display:inline-block;"><el-button v-if="page.ref" type="primary" @click="refresh" plain icon="el-icon-d-arrow-right"></el-button></div></el-pagination></div>'
   },
   //tooltip封装
   tipsDom : {
@@ -640,7 +985,7 @@ fantVueElement.install = function (Vue, options) {
           var t1 =setInterval(function(){$(".opsTimeout")[0].innerHTML = (t--)+"秒后关闭";},1000);
           setTimeout(function(){
             clearInterval(t1);
-            $(".el-message-box__wrapper")[0].getElementsByClassName('el-message-box__headerbtn')[0].click();
+            $(".el-aaa-box__wrapper")[0].getElementsByClassName('el-aaa-box__headerbtn')[0].click();
           },opt.timeout);
         }
         this.$alert(opt.msg, opt.title, opt);
@@ -844,6 +1189,7 @@ fantVueElement.install = function (Vue, options) {
   Vue.component("fTable",elementTemp.tableDom);
   Vue.component("fForm",elementTemp.formDom);
   Vue.component("fFormItem",elementTemp.formItemDom);
+  Vue.component("tableForm",elementTemp.tableFormDom);
 
   /**
    * 调用全局信息提示组件

@@ -1,17 +1,18 @@
-/**
- * js方法集合
- */
-
-Array.prototype.indexOf = function(val) {
-  for (var i = 0; i < this.length; i++) {
-    if (this[i] == val) return i;
+HTMLElement.prototype.addClass = function(className){
+  var name = " "+className;
+  this.className += name;
+}
+HTMLElement.prototype.closest = function(selector){
+  var el = this;
+  var matchesSelector = el.matches || el.webkitMatchesSelector || el.mozMatchesSelector || el.msMatchesSelector;
+  while (el) {
+    if (matchesSelector.call(el, selector)) {
+      break;
+    }
+    el = el.parentElement;
   }
-  return -1;
-};
-Array.prototype.remove = function(val) {
-  var index = this.indexOf(val);
-  if (index > -1) {
-    this.splice(index, 1);
-  }
-};
-
+  return el;
+}
+HTMLElement.prototype.isHidden = function(){
+  return (this.style.display === "none");
+}
