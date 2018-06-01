@@ -1,6 +1,17 @@
+HTMLElement.prototype.hasClass = function(className) {
+  return this.className.match(new RegExp("(\\s|^)" + className + "(\\s|$)"));
+}
 HTMLElement.prototype.addClass = function(className){
   var name = " "+className;
-  this.className += name;
+  if (!this.hasClass(className)){
+    this.className += name;
+  }
+}
+HTMLElement.prototype.removeClass = function(className){
+  if (this.hasClass(className)) {
+    var reg = new RegExp("(\\s|^)" + className + "(\\s|$)");
+    this.className = this.className.replace(reg, " ");
+  }
 }
 HTMLElement.prototype.closest = function(selector){
   var el = this;
@@ -15,4 +26,10 @@ HTMLElement.prototype.closest = function(selector){
 }
 HTMLElement.prototype.isHidden = function(){
   return (this.style.display === "none");
+}
+HTMLElement.prototype.hide = function(){
+  this.style.display = "none";
+}
+HTMLElement.prototype.show = function(){
+  this.style.display = "block";
 }

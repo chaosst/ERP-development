@@ -63,7 +63,7 @@
                     </f-form-item>
                     <div class="btnBox">
                       <el-button style="float: right; padding: 3px 0" type="text" @click="forgetPw">忘记密码</el-button>
-                      <el-button id="submitForm" type="primary" style="width:100%;margin-left:0;" @click="submit">登录</el-button>
+                      <el-button id="submitForm" type="primary" style="width:100%;margin-left:0;" @click="submit" :loading="loading">登录</el-button>
                     </div>
                   </f-form>
                 </div>
@@ -87,6 +87,7 @@
           password:"",
           validateCode:""
         },
+        loading:false,
         formOpt:{
           labelWidth:"0px",
           rules:{
@@ -109,8 +110,15 @@
         var vm = this;
         this.$refs["loginForm"].$children[0].validate(function(valid){
           if (valid) {
-            Vue.set(vm.fdata, 'password', Vue.encode(vm.fdata.password));
-            //Todo:ajax
+            vm.loading = true;
+//            Vue.set(vm.fdata, 'password', Vue.encode(vm.fdata.password));
+            console.log(vm.$store )
+            vm.$store.dispatch('Login', vm.fdata).then(() => {
+              vm.loading = false;
+              vm.$router.push({path: '/'});
+            }).catch((e) => {
+              vm.loading = false
+            })
           } else {
             return false;
           }

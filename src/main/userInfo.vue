@@ -73,55 +73,55 @@
     </div>
     <div class="right">
       <div v-if="linkTips == 1">
-      <el-row class="title">基础资料</el-row>
-      <el-row>
-        <el-col span="19" class="setting">
-          <f-form ref="userForm" :model="userData" :opt="formOpt">
-            <el-row>
-              <el-col span="12">
-                <f-form-item :opt="{label:'姓名：',prop:'username'}">
-                  <el-input v-model="userData.username"></el-input>
-                </f-form-item>
-              </el-col>
-              <el-col span="12">
-                <f-form-item :opt="{label:'性别：',prop:'sex'}">
-                  <el-radio-group v-model="userData.sex">
-                    <el-radio label="1">男</el-radio>
-                    <el-radio label="2">女</el-radio>
-                  </el-radio-group>
-                </f-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
-              <el-col span="12">
-                <f-form-item :opt="{label:'手机：',prop:'phone'}">
-                  <el-input v-model="userData.phone"></el-input>
-                </f-form-item>
-              </el-col>
-              <el-col span="12">
-                <f-form-item :opt="{label:'邮箱：',prop:'email'}">
-                  <el-input v-model="userData.email"></el-input>
-                </f-form-item>
-              </el-col>
-            </el-row>
-            <el-row>
+        <el-row class="title">基础资料</el-row>
+        <el-row>
+          <el-col span="19" class="setting">
+            <f-form ref="userForm" :model="userData" :opt="formOpt">
+              <el-row>
+                <el-col span="12">
+                  <f-form-item :opt="{label:'姓名：',prop:'username'}">
+                    <el-input v-model="userData.username"></el-input>
+                  </f-form-item>
+                </el-col>
+                <el-col span="12">
+                  <f-form-item :opt="{label:'性别：',prop:'sex'}">
+                    <el-radio-group v-model="userData.sex">
+                      <el-radio label="1">男</el-radio>
+                      <el-radio label="2">女</el-radio>
+                    </el-radio-group>
+                  </f-form-item>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col span="12">
+                  <f-form-item :opt="{label:'手机：',prop:'phone'}">
+                    <el-input v-model="userData.phone"></el-input>
+                  </f-form-item>
+                </el-col>
+                <el-col span="12">
+                  <f-form-item :opt="{label:'邮箱：',prop:'email'}">
+                    <el-input v-model="userData.email"></el-input>
+                  </f-form-item>
+                </el-col>
+              </el-row>
+              <el-row>
                 <f-form-item :opt="{label:'地址：',prop:'address'}">
                   <el-input v-model="userData.address"></el-input>
                 </f-form-item>
-            </el-row>
-            <el-row style="text-align:center;padding:20px 0;">
-              <el-button type="primary" @click="saveUserInfo" size="mini">保存</el-button>
-              <el-button type="info" @click="reset" size="mini">重置</el-button>
-            </el-row>
-          </f-form>
-        </el-col>
-        <el-col span="5">
-          <div class="headPic">
-            <img src="../assets/images/pic.jpg" />
-            <el-button type="primary" size="mini">修改头像</el-button>
-          </div>
-        </el-col>
-      </el-row>
+              </el-row>
+              <el-row style="text-align:center;padding:20px 0;">
+                <el-button type="primary" @click="saveUserInfo" size="mini">保存</el-button>
+                <el-button type="info" @click="reset" size="mini">重置</el-button>
+              </el-row>
+            </f-form>
+          </el-col>
+          <el-col span="5">
+            <div class="headPic">
+              <img src="../assets/images/pic.jpg" />
+              <el-button type="primary" size="mini">修改头像</el-button>
+            </div>
+          </el-col>
+        </el-row>
       </div>
       <div v-if="linkTips==2">
         <el-row class="title">修改密码</el-row>

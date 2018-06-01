@@ -189,20 +189,17 @@
         <el-main style="padding:0 0 0 5px;">
           <el-tabs v-model="tabsValue" type="card" @tab-remove="removeTab" @tab-click="tabClick" class="tabs">
             <el-tab-pane
-              :key="item.name"
-              v-for="(item, index) in tabs"
+              :key="key"
+              v-for="(item, key) in tabs"
               :label="item.title"
-              :name="item.name"
+              :name="key"
               :closable="item.closable"
               ref="tabPane"
               :src="item.src"
             >
             </el-tab-pane>
           </el-tabs>
-          <!--<keep-alive :include="mytabs">-->
-            <iframe name="inIframe" class="inIframe" src="/#/main"></iframe>
-            <!--<router-view style="width:100%;height:calc(100% - 56px);overflow:auto;"></router-view>-->
-          <!--</keep-alive>-->
+          <iframe name="inIframe" class="inIframe" src="/#/main"></iframe>
         </el-main>
       </el-container>
     </el-container>
@@ -213,11 +210,12 @@
   export default {
     data () {
       return {
-        tabs:[{
-          title: '首页',
-          name: 'index',
-          src:"/main/index"
-        }],
+        tabs:{
+          index:{
+            title: '首页',
+            src:"/main/index"
+          }
+        },
         user:{
           name:"chao",
         },
@@ -233,7 +231,6 @@
     methods:{
       tabClick(tab, e){
         var $child = window.frames["inIframe"].$vueEl.$children[0];
-//        console.log(this.$router)
         $child.$router.push(tab.$attrs.src);
       },
       removeTab(targetName) {
@@ -242,33 +239,33 @@
         var vm = this;
         var activeName = this.tabsValue;
         if (activeName === targetName) {
-          tabs.forEach(function(tab, index){
-            if (tab.name === targetName) {
-              var nextTab = tabs[index + 1] || tabs[index - 1];
+          var tabsArr = Object.entries(tabs);
+          tabsArr.forEach(function(tab, index){
+            if (tab[0] === targetName) {
+              var nextTab = tabsArr[index + 1] || tabsArr[index - 1];
               if (nextTab) {
-                activeName = nextTab.name;
-                $child.$router.push( nextTab.src);
+                activeName = nextTab[0];
+                $child.$router.push( nextTab[1].src);
               }
             }
           });
         }
         this.tabsValue = activeName;
-        this.tabs = tabs.filter(tab => tab.name !== targetName);
+        delete this.tabs[targetName];
         Vue.arrayRemove($child.mytabs,targetName);
       },
       tabOpen:function(){
         var vm = this;
         var $child = window.frames["inIframe"].$vueEl.$children[0];
-        $child.$router.push("/main/putInStorage",function(router){
+        $child.$router.push("/main/test",function(router){
           var name = router.matched[router.matched.length-1].components.default.name;
           $child.mytabs.push(name);
           vm.tabsValue = name;
-          vm.tabs.push({
+          vm.tabs[name] = {
             title: '示例',
-            name: name,
             closable:true,
-            src:"/main/putInStorage"
-          });
+            src:"/main/test"
+          };
         });
         var $pop = Vue.getEl(".meanPop")
         for(var i=0; i<$pop.length; i++){
@@ -285,12 +282,11 @@
           var name = router.matched[router.matched.length-1].components.default.name;
           $child.mytabs.push(name);
           vm.tabsValue = name;
-          vm.tabs.push({
+          vm.tabs[name] = {
             title: '消息',
-            name: name,
             closable:true,
             src:"/main/message"
-          });
+          };
         });
       },
       userLink(tips){
@@ -300,19 +296,15 @@
           var name = router.matched[router.matched.length-1].components.default.name;
           $child.mytabs.push(name);
           vm.tabsValue = name;
-          vm.tabs.push({
+          vm.tabs[name]={
             title: '个人信息',
-            name: name,
             closable:true,
             src:"/main/userInfo"
-          });
+          };
         });
       }
     },
     mounted:function(){
-//      if(this.tabs.length == 1){
-//        this.$router.push("/main/index");
-//      }
     }
   }
 </script>

@@ -130,7 +130,6 @@
             <el-form-item class="inputItem"  label="入仓仓库：" prop="inWareHouseId">
               <cascader
                 :opt="casOpt"
-                @change="myclose"
                 v-model="editData.inWareHouseId" style="width:90%;">
               </cascader>
             </el-form-item>
@@ -176,50 +175,50 @@
           :columns="columns"
         >
           <template slot="goodsCode" slot-scope="scope">
-            <span v-show="!scope.row.editKey">{{scope.row.goodsCode}}</span>
-            <div v-show="scope.row.editKey">
-              <table-form :scope="scope" prop="goodsId">
-                <f-select placeholder="选择货品" :opt="rowOpt.goodsCode" v-model="scope.row.goodsId"></f-select>
-              </table-form>
-            </div>
+            <table-form :scope="scope" prop="goodsId">
+              <div v-if="!scope.row.editKey['goodsId']" @click="e=>editCell(e,'goodsId',scope.$index)">{{scope.row.goodsCode || '&nbsp;'}}</div>
+              <f-select v-if="scope.row.editKey['goodsId']" placeholder="选择货品" :opt="rowOpt.goodsCode" @blur="saveCell('goodsId',scope.$index)" v-model="scope.row.goodsId"></f-select>
+            </table-form>
           </template>
           <template slot="inWareHouseName" slot-scope="scope">
-            <span v-show="!scope.row.editKey">{{scope.row.inWareHouseName}}</span>
-            <div v-show="scope.row.editKey">
-              <table-form :scope="scope" prop="inWareHouseId">
-                <cascader placeholder="选择仓库" :opt="rowOpt.warehouse" v-model="scope.row.inWareHouseId"></cascader>
-              </table-form>
-            </div>
+            <table-form :scope="scope" prop="inWareHouseId">
+              <div v-if="!scope.row.editKey['inWareHouseId']" @click="e=>editCell(e,'inWareHouseId',scope.$index)">{{scope.row.inWareHouseName || '&nbsp;'}}</div>
+              <cascader v-if="scope.row.editKey['inWareHouseId']" placeholder="选择仓库" :opt="rowOpt.warehouse" @blur="saveCell('inWareHouseId',scope.$index)" v-model="scope.row.inWareHouseId"></cascader>
+            </table-form>
           </template>
           <template slot="goodsSpecName" slot-scope="scope">
-            <span v-show="!scope.row.editKey">{{scope.row.goodsSpecName}}</span>
-            <div v-show="scope.row.editKey"><f-select placeholder="选择属性" :opt="rowOpt.spec" v-model="scope.row.goodsSpecId"></f-select></div>
+            <table-form :scope="scope" prop="goodsSpecId">
+              <div v-if="!scope.row.editKey['goodsSpecId']" @click="e=>editCell(e,'goodsSpecId',scope.$index)">{{scope.row.goodsSpecName || '&nbsp;'}}</div>
+              <f-select v-if="scope.row.editKey['goodsSpecId']" placeholder="选择属性" @blur="saveCell('goodsSpecId',scope.$index)" :opt="rowOpt.spec" v-model="scope.row.goodsSpecId"></f-select>
+            </table-form>
           </template>
           <template slot="unitName" slot-scope="scope">
-            <span v-show="!scope.row.editKey">{{scope.row.unitName}}</span>
-            <div v-show="scope.row.editKey"><f-select placeholder="选择单位" :opt="rowOpt.unit" v-model="scope.row.unitId"></f-select></div>
+            <table-form :scope="scope" prop="unitId">
+              <div v-if="!scope.row.editKey['unitId']" @click="e=>editCell(e,'unitId',scope.$index)">{{scope.row.unitName || '&nbsp;'}}</div>
+              <f-select v-if="scope.row.editKey['unitId']" placeholder="选择单位" @blur="saveCell('unitId',scope.$index)" :opt="rowOpt.unit" v-model="scope.row.unitId"></f-select>
+            </table-form>
           </template>
           <template slot="quentity" slot-scope="scope">
-            <span v-show="!scope.row.editKey">{{scope.row.quentity}}</span>
-            <div v-show="scope.row.editKey"><el-input-number size="mini" :controls="false" v-model="scope.row.quentity" style="width:80%;"></el-input-number></div>
+            <table-form :scope="scope" prop="quentity">
+              <div v-if="!scope.row.editKey['quentity']" @click="e=>editCell(e,'quentity',scope.$index)">{{scope.row.quentity || '&nbsp;'}}</div>
+              <el-input-number v-if="scope.row.editKey['quentity']" @blur="saveCell('quentity',scope.$index)" size="mini" :controls="false" v-model="scope.row.quentity" style="width:80%;"></el-input-number>
+            </table-form>
           </template>
           <template slot="unitPrice" slot-scope="scope">
-            <span v-show="!scope.row.editKey">{{scope.row.unitPrice}}</span>
-            <div v-show="scope.row.editKey"><el-input-number size="mini" :controls="false" v-model="scope.row.unitPrice" style="width:80%;"></el-input-number></div>
+            <table-form :scope="scope" prop="unitPrice">
+              <div v-if="!scope.row.editKey['unitPrice']" @click="e=>editCell(e,'unitPrice',scope.$index)">{{scope.row.unitPrice || '&nbsp;'}}</div>
+              <el-input-number v-if="scope.row.editKey['unitPrice']" size="mini" @blur="saveCell('unitPrice',scope.$index)" :controls="false" v-model="scope.row.unitPrice" style="width:80%;"></el-input-number>
+            </table-form>
           </template>
           <template slot="type" slot-scope="scope">
-            <span v-show="!scope.row.editKey">{{scope.row.type}}</span>
-            <div v-show="scope.row.editKey"><el-input-number size="mini" :controls="false" v-model="scope.row.type" style="width:80%;"></el-input-number></div>
+            <table-form :scope="scope" prop="type">
+              <div v-if="!scope.row.editKey['type']" @click="e=>editCell(e,'type',scope.$index)">{{scope.row.type || '&nbsp;'}}</div>
+              <div v-if="scope.row.editKey['type']"><el-input-number size="mini" @blur="saveCell('type',scope.$index)" :controls="false" v-model="scope.row.type" style="width:80%;"></el-input-number></div>
+            </table-form>
           </template>
           <template slot="describe" slot-scope="scope">
-            <span v-show="!scope.row.editKey">{{scope.row.describe}}</span>
-            <div v-show="scope.row.editKey"><el-input size="mini" placeholder="输入备注" v-model="scope.row.describe"></el-input></div>
-          </template>
-          <template slot="action" slot-scope="scope">
-            <el-button v-show="!scope.row.editKey" type="primary" size="mini" @click="editRow(scope.$index,scope.row)" circle class="el-icon-edit editBtn tableBtn"></el-button>
-            <el-button v-show="!scope.row.editKey" type="warning" size="mini" @click="delRow(scope.$index,scope.row)" circle class="el-icon-delete tableBtn"></el-button>
-            <el-button v-show="scope.row.editKey" type="success" size="mini" @click="saveRow(scope.$index,scope.row)" circle class="el-icon-fant-right tableBtn"></el-button>
-            <el-button v-show="scope.row.editKey" type="warning" size="mini" @click="cancelRow(scope.$index,scope.row)" circle class="el-icon-fant-close tableBtn"></el-button>
+              <div v-if="!scope.row.editKey['describe']" @click="e=>editCell(e,'describe',scope.$index)">{{scope.row.describe || '&nbsp;'}}</div>
+              <div v-if="scope.row.editKey['describe']"><el-input size="mini" @blur="saveCell('describe',scope.$index)" placeholder="输入备注" v-model="scope.row.describe"></el-input></div>
           </template>
           <div slot="append" style="padding:0 20px;border-bottom:1px solid #ddd;">
             <el-button type="text" icon="el-icon-fant-add" @click="addRow"></el-button>
@@ -229,7 +228,7 @@
     </el-row>
   </div>
     <div class="warehouseFooter">
-        <el-button type="primary" size="small" >保存</el-button>
+        <el-button type="primary" size="small" @click="save" >保存</el-button>
         <el-button type="primary" size="small" >付款</el-button>
         <el-button type="info" size="small" >费用详情</el-button>
         <el-button type="warning" size="small" >复制</el-button>
@@ -289,11 +288,10 @@
           showSummary:true
         },
         casOpt:{
-          url:"storehouses/getTreeOfEnable",
-          changeOnSelect:true
+//          url:"storehouses/getTreeOfEnable",
+          changeOnSelect:true,
         },
         columns:[
-          {prop:"action",label:"操作",minWidth:"100"},
           {prop:"goodsCode",label:"编号",minWidth:"100",rules:[
             { required: true, message: '请选择货品', trigger: 'change' }
           ]},
@@ -321,7 +319,7 @@
           textField:"name",
           idField:"fid",
           prompt:"供应商",
-          url:"supplier/vagueSearch?showDisable=0&searchSize=8",
+//          url:"supplier/vagueSearch?showDisable=0&searchSize=8",
           columns:[
             {name:"编号",width:20,key:"code"},
             {name:"供应商",width:20,key:"name"},
@@ -334,7 +332,7 @@
           textField:"username",
           idField:"fid",
           prompt:"采购员",
-          url:"member/vagueSearch",
+//          url:"member/vagueSearch",
           columns:[
             {name:"人员",width:20,key:"username"},
             {name:"编号",width:20,key:"userCode"},
@@ -347,9 +345,9 @@
     },
     mounted:function(){
       var vm = this;
-      this.$http.get("storehouses/getTreeOfEnable").then(function(re){
-        vm.wareData = re.body.length>0?re.body[0].children:[];
-      });
+//      this.$http.get("storehouses/getTreeOfEnable").then(function(re){
+//        vm.wareData = re.body.length>0?re.body[0].children:[];
+//      });
     },
     updated:function(){
       console.log("传入的FID："+this.fid);
@@ -372,10 +370,19 @@
         }
       },
       addRow(){
-        this.mydata.push({action:"",goodsId:"",inWarehouseId:"",editKey:true});
+        this.mydata.push({action:"",goodsId:"",goodsCode:"",inWarehouseId:"",editKey:{}});
       },
-      editRow(){
-
+      editCell(e,name,index){
+        Vue.set(this.mydata[index].editKey,name,true);
+        var parent = e.target.parentNode;
+        this.$nextTick(()=>{
+          Vue.keyHandler(parent);
+          if(Vue.getEl(".row"+index+"-"+name).length > 0) {
+            Vue.getEl(".row" + index + "-" + name)[0].getElementsByTagName("input")[0].focus();
+          }else{
+            parent.getElementsByTagName("input")[0].focus();
+          }
+        });
       },
       delRow(){
 
@@ -383,14 +390,34 @@
       cancelRow(){
 
       },
-      saveRow(index){
-        var a = Vue.fromArray(Vue.getEl(".row"+index));
+      saveCell(name,index){
+        var vm = this;
+        if(Vue.getEl(".row"+index+"-"+name).length == 0){
+          Vue.set(vm.mydata[index].editKey,name,false);
+          return false;
+        }
+        var el = Vue.getEl(".row"+index+"-"+name)[0].$vueEl;
+        el.$children[0].validate(function(valid) {
+          console.log(valid)
+          if (valid) {
+            Vue.set(vm.mydata[index].editKey,name,false);
+          } else {
+            return false;
+          }
+        });
+      },
+      save(){
+        var a = Vue.fromArray(Vue.getEl(".fant-table-form"));
         a.map(function(i){
           var el = i.$vueEl;
           el.$children[0].validate(function(valid) {
             if (valid) {
-              console.log(1)
+              //todo
             } else {
+              var content = i.getElementsByClassName("el-form-item__content");
+              if(content.length !=0 && content[0].getElementsByTagName("input").length === 0){
+                content[0].childNodes[0].click();
+              }
               return false;
             }
           });

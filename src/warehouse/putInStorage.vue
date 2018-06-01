@@ -317,6 +317,12 @@
     },
     mounted:function(){
       window.$vueParentEl = this;
+      Vue.http.post("warehouse/cgrk/list",{page:1}).then(function(re){
+        if(re.body.rows){
+          this.mydata = re.body.rows;
+          this.dataCount = re.body.total;
+        }
+      });
     },
     updated(){
 

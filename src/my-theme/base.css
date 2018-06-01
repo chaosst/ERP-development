@@ -7,3 +7,6 @@ body{
 .minBtn{
   padding: 3px;
 }
+.treebox-selected{
+  background:red;
+}

@@ -1,6 +1,5 @@
 import Vue from 'vue';
-import  VueResource  from 'vue-resource';
-Vue.use(VueResource);
+import axios from 'axios'
 var commonTemp = {
   //页面帮助步骤显示
   helpDom : {
@@ -43,8 +42,16 @@ var commonTemp = {
     template:'<div v-if="visible"><div v-show="opt.show" v-for="(opt,index) in photoOpt" class="v-modal" style="z-index: 2243;"><img :src="opt.src" :class="opt.class" :style="{position:\'absolute\',top:opt.top,left:opt.left}" /><div class="ops-help-btn"><el-button type="primary" v-if="index!=0" @click="prev(index)" class="ops-help-prev">上一步</el-button><el-button type="primary" v-if="index!=(photoOpt.length-1)" @click="next(index)" class="ops-help-next">下一步</el-button><el-button type="warning" @click="close" class="ops-help-close">关闭</el-button></div></div></div>',
   }
 }
+var qs = require('qs'); // ES5
+/*ajax的全局设置 */
+axios.defaults.baseURL = process.env.BASE_API;
+axios.defaults.transformRequest = [function(data) {
+  return qs.stringify(data);
+}];
+
 var fantVueCommon = {};
 fantVueCommon.install = function (Vue, options) {
+  Vue.http = axios;
   Vue.arrayRemove = function(arr, val){
     var index = arr.indexOf(val);
     if (index > -1) {
@@ -204,10 +211,6 @@ fantVueCommon.install = function (Vue, options) {
       return document.getElementsByClassName(myel);
     }
   }
-  /*ajax的全局设置 */
-  Vue.http.options.root = "";
-  Vue.http.options.emulateJSON = true;
-//	  Vue.http.headers.common['Authorization'] = '';
   /**
    * 同步ajax，原生js
    */
@@ -221,7 +224,7 @@ fantVueCommon.install = function (Vue, options) {
       return false;
     }
     if(typeof obj.url !== "string")return false;
-    var Root = "/";
+    var Root = process.env.BASE_API;
     let request = new XMLHttpRequest();
     request.open(obj.method, Root+obj.url, false) // 第三个参数 false 代表设置同步请求
     request.setRequestHeader('Accept', 'application/json');
@@ -363,6 +366,7 @@ fantVueCommon.install = function (Vue, options) {
                         inputs[next].vueEl.$children[0].focus();
                       }else{
                         inputs[next].focus();
+                        inputs[next].click();
                       }
                     },100);
                   }
