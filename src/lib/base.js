@@ -25,12 +25,12 @@ var commonTemp = {
     },
     methods:{
       next:function(i){
-        Vue.set(this.photoOpt[i], "show", 0);
-        Vue.set(this.photoOpt[i+1], "show", 1);
+        this.$set(this.photoOpt[i], "show", 0);
+        this.$set(this.photoOpt[i+1], "show", 1);
       },
       prev:function(i){
-        Vue.set(this.photoOpt[i], "show", 0);
-        Vue.set(this.photoOpt[i-1], "show", 1);
+        this.$set(this.photoOpt[i], "show", 0);
+        this.$set(this.photoOpt[i-1], "show", 1);
       },
       close:function(){
         this.visible = 0;
@@ -39,7 +39,7 @@ var commonTemp = {
     created:function(){
       this.photoOpt[0].show = true;
     },
-    template:'<div v-if="visible"><div v-show="opt.show" v-for="(opt,index) in photoOpt" class="v-modal" style="z-index: 2243;"><img :src="opt.src" :class="opt.class" :style="{position:\'absolute\',top:opt.top,left:opt.left}" /><div class="ops-help-btn"><el-button type="primary" v-if="index!=0" @click="prev(index)" class="ops-help-prev">上一步</el-button><el-button type="primary" v-if="index!=(photoOpt.length-1)" @click="next(index)" class="ops-help-next">下一步</el-button><el-button type="warning" @click="close" class="ops-help-close">关闭</el-button></div></div></div>',
+    template:'<div v-if="visible"><div v-show="opt.show" v-for="(opt,index) in photoOpt" class="v-modal" style="z-index: 2243;"><img :src="opt.src" :class="opt.class" :style="{position:\'absolute\',top:typeof opt.top === \'number\'?opt.top+\'px\':opt.top,left:typeof opt.left === \'number\'?opt.left+\'px\':opt.left}" /><div class="fant-help-btn"><el-button type="primary" v-if="index!=0" @click="prev(index)" class="fant-help-prev">上一步</el-button><el-button type="primary" v-if="index!=(photoOpt.length-1)" @click="next(index)" class="fant-help-next">下一步</el-button><el-button type="warning" @click="close" class="fant-help-close">关闭</el-button></div></div></div>',
   }
 }
 var qs = require('qs'); // ES5
@@ -52,24 +52,31 @@ axios.defaults.transformRequest = [function(data) {
 var fantVueCommon = {};
 fantVueCommon.install = function (Vue, options) {
   Vue.http = axios;
+  Vue.prototype.$http = axios;
   Vue.arrayRemove = function(arr, val){
     var index = arr.indexOf(val);
     if (index > -1) {
       arr.splice(index, 1);
     }
   }
+  Vue.prototype.$arrayRemove = Vue.arrayRemove;
   Vue.indexOfArray = function(arr, obj) {
     var index = null;
-    var key = Object.keys(obj)[0];
-    arr.every(function(value, i) {
-      if (value[key] === obj[key]) {
-        index = i;
-        return false;
-      }
-      return true;
-    });
+    if(typeof val === "object") {
+      var key = Object.keys(val)[0];
+      arr.every(function (value, i) {
+        if (value[key] === val[key]) {
+          index = i;
+          return false;
+        }
+        return true;
+      });
+    }else if(typeof val === "string"){
+      index = arr.indexOf(val);
+    }
     return index;
   }
+  Vue.prototype.$indexOfArray = Vue.indexOfArray;
   Vue.encode=function (input) {
     var output = "";
     var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
@@ -101,7 +108,8 @@ fantVueCommon.install = function (Vue, options) {
     }
 
     return output;
-  },
+  }
+  Vue.prototype.$encode = Vue.encode;
 
   // public method for decoding
   Vue.decode=function (input) {
@@ -138,7 +146,8 @@ fantVueCommon.install = function (Vue, options) {
 
     return output;
 
-  },
+  }
+  Vue.prototype.$decode = Vue.decode;
 
   // private method for UTF-8 encoding
   Vue._utf8_encode=function (string) {
@@ -165,7 +174,8 @@ fantVueCommon.install = function (Vue, options) {
     }
 
     return utftext;
-  },
+  }
+  Vue.prototype.$_utf8_encode = Vue._utf8_encode;
 
   // private method for UTF-8 decoding
   Vue._utf8_decode=function (utftext) {
@@ -197,12 +207,13 @@ fantVueCommon.install = function (Vue, options) {
 
     return string;
   }
+  Vue.prototype.$_utf8_decode = Vue._utf8_decode;
   /**
    * 通过class或者id获取对象
    * @param el
    * @returns
    */
-   Vue.getEl = function(el){
+  Vue.getEl = function(el){
     var myel = el.substr(1);
     var key = el.split('')[0];
     if(key == "#"){
@@ -211,6 +222,7 @@ fantVueCommon.install = function (Vue, options) {
       return document.getElementsByClassName(myel);
     }
   }
+  Vue.prototype.$getEl = Vue.getEl;
   /**
    * 同步ajax，原生js
    */
@@ -256,6 +268,8 @@ fantVueCommon.install = function (Vue, options) {
       }
     }
   }
+  Vue.prototype.$ajax = Vue.ajax;
+
   Vue.serialize = function(obj){
     if(typeof obj !== "object"){
       return false;
@@ -266,6 +280,7 @@ fantVueCommon.install = function (Vue, options) {
     }
     return ser;
   }
+  Vue.prototype.$serialize = Vue.serialize;
   /**
    * 深拷贝函数
    */
@@ -273,6 +288,7 @@ fantVueCommon.install = function (Vue, options) {
     var jsonStr = JSON.stringify(source);
     return JSON.parse(jsonStr);
   }
+  Vue.prototype.$deepCopy = Vue.deepCopy;
   /**
    * 对象合并函数，浅拷贝
    */
@@ -282,40 +298,29 @@ fantVueCommon.install = function (Vue, options) {
     }
     return Object.assign.apply(Object, [source].concat(obj));
   }
+  Vue.prototype.$assign = Vue.assign;
   /**
    * 将一组值转为数组
    */
   Vue.toArray = function () {
     return Array.of.apply(Array, arguments);
   }
+  Vue.prototype.$toArray = Vue.toArray;
   /**
    * 将类数组转为数组
    */
   Vue.fromArray = function () {
     return Array.from.apply(Array, arguments);
   }
+  Vue.prototype.$fromArray = Vue.fromArray;
   /**
    * 判断数字是否整数
    */
   Vue.isInteger = function (num) {
     return Number.isInteger(num);
   }
+  Vue.prototype.$isInteger = Vue.isInteger;
   //添加全局资源
-  /**
-   * v-star，只能在el-form-item里面使用，如果el-form-item设置了label，则直接在label前插入红色星号
-   */
-  Vue.directive('star', {
-    bind: function (el,binding,vnode) {
-      if(el.className.indexOf("el-form-item") != -1){
-        var label = el.getElementsByClassName("el-form-item__label");
-        if(label.length != 0){
-          var oldDom = label[0].innerHTML;
-          label[0].innerHTML = "<div style='display:inline-block;color:red;'>*</div>"+oldDom;
-        }
-
-      }
-    }
-  });
   /**
    * v-enter，自动focus标签下的第一个input，回车自动搜寻下一个的input
    */
@@ -380,7 +385,7 @@ fantVueCommon.install = function (Vue, options) {
       }else{
         el.addEventListener("keydown",function(e){
           if(e.keyCode == 13){
-            $(btn).click();
+            Vue.getEl(btn).click();
           }
         });
 

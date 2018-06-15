@@ -41,30 +41,6 @@
   .tableBtn{
     padding:1px;
   }
-  .rotate0{
-    transform: rotate(0deg);
-    -webkit-transform: rotate(0deg);
-    -moz-transform: rotate(0deg);
-    -o-transform: rotate(0deg);
-    -ms-transform: rotate(0deg);
-    transition:transform 500ms ease-in-out;
-    -webkit-animation:transform 500ms ease-in-out;
-    -moz-animation:transform 500ms ease-in-out;
-    -ms-animation:transform 500ms ease-in-out;
-    -o-animation:transform 500ms ease-in-out;
-  }
-  .rotate{
-    transform: rotate(180deg);
-    -webkit-transform: rotate(180deg);
-    -moz-transform: rotate(180deg);
-    -o-transform: rotate(180deg);
-    -ms-transform: rotate(180deg);
-    transition:transform 500ms ease-in-out;
-    -webkit-animation:transform 500ms ease-in-out;
-    -moz-animation:transform 500ms ease-in-out;
-    -ms-animation:transform 500ms ease-in-out;
-    -o-animation:transform 500ms ease-in-out;
-  }
   .hideBtn{
     position:absolute;
     right: 10px;
@@ -130,6 +106,7 @@
             <el-form-item class="inputItem"  label="入仓仓库：" prop="inWareHouseId">
               <cascader
                 :opt="casOpt"
+                :data="[]"
                 v-model="editData.inWareHouseId" style="width:90%;">
               </cascader>
             </el-form-item>
@@ -177,25 +154,25 @@
           <template slot="goodsCode" slot-scope="scope">
             <table-form :scope="scope" prop="goodsId">
               <div v-if="!scope.row.editKey['goodsId']" @click="e=>editCell(e,'goodsId',scope.$index)">{{scope.row.goodsCode || '&nbsp;'}}</div>
-              <f-select v-if="scope.row.editKey['goodsId']" placeholder="选择货品" :opt="rowOpt.goodsCode" @blur="saveCell('goodsId',scope.$index)" v-model="scope.row.goodsId"></f-select>
+              <f-select v-if="scope.row.editKey['goodsId']" placeholder="选择货品" :data="[]" :opt="rowOpt.goodsCode" @blur="saveCell('goodsId',scope.$index)" v-model="scope.row.goodsId"></f-select>
             </table-form>
           </template>
           <template slot="inWareHouseName" slot-scope="scope">
             <table-form :scope="scope" prop="inWareHouseId">
               <div v-if="!scope.row.editKey['inWareHouseId']" @click="e=>editCell(e,'inWareHouseId',scope.$index)">{{scope.row.inWareHouseName || '&nbsp;'}}</div>
-              <cascader v-if="scope.row.editKey['inWareHouseId']" placeholder="选择仓库" :opt="rowOpt.warehouse" @blur="saveCell('inWareHouseId',scope.$index)" v-model="scope.row.inWareHouseId"></cascader>
+              <cascader v-if="scope.row.editKey['inWareHouseId']" placeholder="选择仓库" :data="[]" :opt="rowOpt.warehouse" @blur="saveCell('inWareHouseId',scope.$index)" v-model="scope.row.inWareHouseId"></cascader>
             </table-form>
           </template>
           <template slot="goodsSpecName" slot-scope="scope">
             <table-form :scope="scope" prop="goodsSpecId">
               <div v-if="!scope.row.editKey['goodsSpecId']" @click="e=>editCell(e,'goodsSpecId',scope.$index)">{{scope.row.goodsSpecName || '&nbsp;'}}</div>
-              <f-select v-if="scope.row.editKey['goodsSpecId']" placeholder="选择属性" @blur="saveCell('goodsSpecId',scope.$index)" :opt="rowOpt.spec" v-model="scope.row.goodsSpecId"></f-select>
+              <f-select v-if="scope.row.editKey['goodsSpecId']" placeholder="选择属性" :data="[]" @blur="saveCell('goodsSpecId',scope.$index)" :opt="rowOpt.spec" v-model="scope.row.goodsSpecId"></f-select>
             </table-form>
           </template>
           <template slot="unitName" slot-scope="scope">
             <table-form :scope="scope" prop="unitId">
               <div v-if="!scope.row.editKey['unitId']" @click="e=>editCell(e,'unitId',scope.$index)">{{scope.row.unitName || '&nbsp;'}}</div>
-              <f-select v-if="scope.row.editKey['unitId']" placeholder="选择单位" @blur="saveCell('unitId',scope.$index)" :opt="rowOpt.unit" v-model="scope.row.unitId"></f-select>
+              <f-select v-if="scope.row.editKey['unitId']" placeholder="选择单位" :data="[]" @blur="saveCell('unitId',scope.$index)" :opt="rowOpt.unit" v-model="scope.row.unitId"></f-select>
             </table-form>
           </template>
           <template slot="quentity" slot-scope="scope">
@@ -238,7 +215,7 @@
 
 <script>
   import Vue from "vue";
-  import valid from '../lib/validate';
+  import valid from '@/lib/validate';
   var adata = [{"auditTime":"2018-03-06 23:59:30","auditorId":"402881255a12894d015a12af35410009","auditorName":"杨兆明","billDate":"2018-03-06 00:00:00","billType":11,"billextendDetailList":[],"bindingAmount":0E-8,"cancelTime":"","code":"CGRK201803060015","createId":"402881255a12894d015a12af35410009","createTime":"2018-03-06 23:59:14","creatorName":"杨兆明","csvId":"402881835fa060e201602626e46b5a30","csvName":"乌兰矿","csvType":2,"deptId":"402881255a12894d015a12adfacd0005","deptName":"采购部","describe":"","detailList":[],"detal":"1","endDate":"2018-03-08 00:00:00","expenseAmount":"0","fid":"2c92e07e61fb09620161fc09c41f0135","freeAmount":"0","inMemberId":"402881835d05dff2015d30777ff53e5f","inMemberName":"杨兆明","inWareHouseId":"402881835fa060e20160262743675a32","inWareHouseName":"乌兰矿","ischeck":0,"otherCharges":"0","productionStatus":0,"recordStatus":1,"stockPeriodDetail":"201803","stockPeriodId":"5e5d857c60c6969a0160ddc8bfec2528","supplierAddress":"","supplierCode":"62","supplierContact":"","supplierId":"402881835fa060e201602626e46b5a30","supplierName":"乌兰矿","supplierPhone":"","totalAmount":"76345.8","totalPayAmount":"0","transportBilldetailList":[],"unCheckAmount":76345.80000000,"updateTime":"2018-03-06 23:59:22","voucherCode":"","warehouseBillSerialDetail":[]},{"auditTime":"2018-03-06 23:40:21","auditorId":"402881255a12894d015a12af35410009","auditorName":"杨兆明","billDate":"2018-03-06 00:00:00","billType":11,"billextendDetailList":[],"bindingAmount":0E-8,"cancelTime":"","code":"CGRK201803060014","createId":"402881255a12894d015a12af35410009","createTime":"2018-03-06 23:38:25","creatorName":"杨兆明","csvId":"402881835f6bd14d015f7082f44d0e93","csvName":"霍洛湾煤矿","csvType":2,"deptId":"402881255a12894d015a12adfacd0005","deptName":"采购部","describe":"","detailList":[],"detal":"1","endDate":"2018-03-08 00:00:00","expenseAmount":"0","fid":"2c92e07e61fb09620161fbf6b49d0108","freeAmount":"0","inMemberId":"402881835d05dff2015d30777ff53e5f","inMemberName":"杨兆明","inWareHouseId":"402881835f6bd14d015f707a8fa40d1d","inWareHouseName":"霍洛湾煤矿","ischeck":0,"otherCharges":"0","productionStatus":0,"recordStatus":1,"stockPeriodDetail":"201803","stockPeriodId":"5e5d857c60c6969a0160ddc8bfec2528","supplierAddress":"","supplierCode":"57","supplierContact":"","supplierId":"402881835f6bd14d015f7082f44d0e93","supplierName":"霍洛湾煤矿","supplierPhone":"","totalAmount":"254865","totalPayAmount":"0","transportBilldetailList":[],"unCheckAmount":254865.00000000,"updateTime":"2018-03-06 23:39:50","voucherCode":"","warehouseBillSerialDetail":[]}];
   export default {
     name:"putInStorageEdit",
@@ -263,16 +240,12 @@
         },
         rowOpt:{
           goodsCode:{
-            data:[]
           },
           warehouse:{
-            data:[]
           },
           spec:{
-            data:[]
           },
           unit:{
-            data:[]
           }
         },
         inputHeight:"30px",
@@ -312,7 +285,7 @@
         endDateOpt:{
           prompt:"计划入仓日期"
         },
-        infoBtnClass:"el-icon-fant-unfold rotate0 hideBtn miniBtn",
+        infoBtnClass:"el-icon-fant-unfold rotate-current hideBtn miniBtn",
         boxHide:0,
         supOpt:{
           width:"90%",
@@ -366,7 +339,7 @@
           this.infoBtnClass = "el-icon-fant-unfold rotate hideBtn miniBtn";
         }else{
           this.boxHide = 0;
-          this.infoBtnClass = "el-icon-fant-unfold rotate0 hideBtn miniBtn";
+          this.infoBtnClass = "el-icon-fant-unfold rotate-current hideBtn miniBtn";
         }
       },
       addRow(){

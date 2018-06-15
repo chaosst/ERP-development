@@ -1,7 +1,6 @@
-import message from '@/main/message'
-import userInfo from '@/main/userInfo'
-import indexPage from '@/main/indexPage'
-import test from '@/main/test'
+import message from '@/main/system/message'
+import userInfo from '@/main/system/userInfo'
+import indexPage from '@/main/system/indexPage'
 
 export default[
   {
@@ -19,9 +18,5 @@ export default[
   {
     path: 'userInfo',
     component: userInfo,
-  },
-  {
-    path: 'test',
-    component: test,
   }
 ]

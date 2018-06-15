@@ -5,7 +5,7 @@
     min-width:800px;
   }
   .header{
-    background:url(../assets/images/register.jpeg) top center no-repeat;
+    background:url(~assets/images/register.jpeg) top center no-repeat;
     background-size:100%;
     height:100px !important;
   }
@@ -88,8 +88,7 @@
 </template>
 
 <script>
-  import Vue from "vue";
-  import valid from '../lib/validate';
+  import valid from '@/lib/validate';
   export default {
     data () {
       var confirmPass = (rule, value, callback) => {

@@ -75,15 +75,15 @@
       <div v-if="linkTips == 1">
         <el-row class="title">基础资料</el-row>
         <el-row>
-          <el-col span="19" class="setting">
+          <el-col :span="19" class="setting">
             <f-form ref="userForm" :model="userData" :opt="formOpt">
               <el-row>
-                <el-col span="12">
+                <el-col :span="12">
                   <f-form-item :opt="{label:'姓名：',prop:'username'}">
                     <el-input v-model="userData.username"></el-input>
                   </f-form-item>
                 </el-col>
-                <el-col span="12">
+                <el-col :span="12">
                   <f-form-item :opt="{label:'性别：',prop:'sex'}">
                     <el-radio-group v-model="userData.sex">
                       <el-radio label="1">男</el-radio>
@@ -93,12 +93,12 @@
                 </el-col>
               </el-row>
               <el-row>
-                <el-col span="12">
+                <el-col :span="12">
                   <f-form-item :opt="{label:'手机：',prop:'phone'}">
                     <el-input v-model="userData.phone"></el-input>
                   </f-form-item>
                 </el-col>
-                <el-col span="12">
+                <el-col :span="12">
                   <f-form-item :opt="{label:'邮箱：',prop:'email'}">
                     <el-input v-model="userData.email"></el-input>
                   </f-form-item>
@@ -115,9 +115,9 @@
               </el-row>
             </f-form>
           </el-col>
-          <el-col span="5">
+          <el-col :span="5">
             <div class="headPic">
-              <img src="../assets/images/pic.jpg" />
+              <img src="~assets/images/pic.jpg" />
               <el-button type="primary" size="mini">修改头像</el-button>
             </div>
           </el-col>
@@ -154,8 +154,7 @@
 </template>
 
 <script>
-  import Vue from "vue";
-  import valid from '../lib/validate';
+  import valid from '@/lib/validate';
   export default {
     name:"userInfo",
     data () {
@@ -221,7 +220,7 @@
         });
       },
       reset(){
-        this.userData = Vue.deepCopy(this.oldUserData);
+        this.userData = this.$deepCopy(this.oldUserData);
       },
       savePwd(){
         var vm = this;
@@ -235,7 +234,7 @@
       }
     },
     mounted(){
-      this.oldUserData = Vue.deepCopy(this.userData);
+      this.oldUserData = this.$deepCopy(this.userData);
     }
   }
 </script>

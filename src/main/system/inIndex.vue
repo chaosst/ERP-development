@@ -1,8 +1,4 @@
 <style scoped>
-  .inIndexBox{
-    width:100%;
-    height:100%;
-  }
   .window{
     width:100%;height:100%;
     background:#000;
@@ -12,14 +8,13 @@
   }
 </style>
 <template>
-  <div class="inIndexBox" v-cloak>
+  <div class="iframeBox" v-cloak>
     <keep-alive :include="mytabs">
-      <router-view style="width:100%;height:100%;"></router-view>
+      <router-view></router-view>
     </keep-alive>
   </div>
 </template>
 <script>
-  import Vue from "vue";
   export default {
     data () {
       return {
@@ -43,10 +38,10 @@
         $root.tabs[name].src = path;
       }
       //修复切换tab页的时候，下拉框不消失的问题
-      Vue.fromArray(Vue.getEl(".el-picker-panel")).forEach(function(item){
+      this.$fromArray(this.$getEl(".el-picker-panel")).forEach(function(item){
         if(!item.isHidden())item.hide();
       });
-      Vue.fromArray(Vue.getEl(".el-cascader-menus")).forEach(function(item){
+      this.$fromArray(this.$getEl(".el-cascader-menus")).forEach(function(item){
         console.log(122)
         if(!item.isHidden())item.hide();
       });

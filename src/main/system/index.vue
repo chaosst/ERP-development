@@ -67,13 +67,13 @@
   }
   .mybadge{
     float: right;
-    margin-top:15px;
+    margin-top:10px;
   }
   .headPic{
     width:30px;
     height:30px;
     border-radius:10%;
-    margin-top:15px;
+    margin-top:10px;
   }
   .moreInfo{
     color:#fff;
@@ -101,18 +101,52 @@
     background-color:#0366d6;
   }
   .tabs{
-    margin-top:5px;
-    height:50px;
+    border-top:1px solid #ddd;
+    height:35px;
+    background:#fff;
   }
   .inIframe{
-    width:100%;height:calc(100% - 60px);overflow:auto;
+    width:calc(100% - 10px);height:calc(100% - 35px);overflow:auto;
     border:0;
+    margin-left:10px;
   }
+  .tabs >>>.el-tabs__item {
+    padding: 0 20px 0 20px !important;
+    height: 35px;
+    line-height: 35px;
+    border-right:1px solid #ddd;
+  }
+  .tabs >>> .el-tabs__active-bar{
+    display:none;
+  }
+  .tabs >>> .el-tabs__nav-wrap::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 1px;
+    background-color: #ddd;
+    z-index: 1;
+  }
+  .tabs >>> .el-tabs__item.is-active {
+    border-bottom:2px solid #409EFF;
+  }
+  .tabs >>> #tab-action{
+    padding:0 !important;
+    background:#eee;
+    height:34px;
+    cursor:pointer;
+  }
+  .tabs >>> #tab-action:hover{
+    opacity:0.8;
+  }
+
 </style>
 <template>
   <div class="layout">
     <el-container style="height:100%;">
-      <el-header style="text-align: right; font-size: 12px;background-color: #2b3643">
+      <el-header style="text-align: right; font-size: 12px;background-color: #2b3643;height:50px;">
         <el-row style="height:100%;">
           <el-col :span="6" style="text-align:left;color:#fff;font-size:30px;height:100%;line-height:100%;">
             logo
@@ -120,10 +154,10 @@
           <el-col :span="18" style="text-align:right;height:100%;">
             <div class="headerBtnBox">
               <div style="display:inline-block;height:100%;cursor:pointer;" v-popover:userInfo>
-                <img src="../assets/images/pic.jpg" class="headPic" />
+                <img src="~assets/images/pic.jpg" class="headPic" />
                 <el-button type="text" icon="el-icon-fant-unfold" class="moreInfo" title="更多信息"></el-button>
               </div>
-              <el-button type="text" class="headerBtn" style="margin-top:15px;" icon="el-icon-fant-offline" @click="signOut" title="退出系统"></el-button>
+              <el-button type="text" class="headerBtn" style="margin-top:10px;" icon="el-icon-fant-offline" @click="signOut" title="退出系统"></el-button>
               <el-badge :value="102" :max="99" class="mybadge">
                 <el-button type="text" class="headerBtn" icon="el-icon-fant-message" @click="linkToMsg" title="信息"></el-button>
               </el-badge>
@@ -145,30 +179,53 @@
             popper-class="meanPop"
             trigger="hover">
             <el-row>
-              <el-col :span="8">
-                <label>采购</label>
+              <el-col :span="4.8">
+                <label>期初</label>
                 <ul>
-                  <li @click="tabOpen">采购入库</li>
-                  <li>采购订单</li>
-                  <li>采购出库</li>
-                  <li>采购退货</li>
+                  <li @click="tabOpen" src="/main/qckc" name="期初库存">期初库存</li>
                 </ul>
               </el-col>
-              <el-col :span="8">
+              <el-col :span="4.8">
+                <label>采购</label>
+                <ul>
+                  <li>采购询价</li>
+                  <li>采购订单</li>
+                  <li>采购入库</li>
+                  <li>采购出库</li>
+                  <li>采购退货</li>
+                  <li>采购发票</li>
+                  <li>采购返利单</li>
+                  <li>付款单</li>
+                </ul>
+              </el-col>
+              <el-col :span="4.8">
                 <label>销售</label>
                 <ul>
-                  <li>销售报价</li>
                   <li>销售订单</li>
                   <li>销售出货</li>
                   <li>销售退货</li>
+                  <li>销售发票</li>
+                  <li>销售返利单</li>
+                  <li>收款单</li>
+                  <li>费用单</li>
                 </ul>
               </el-col>
-              <el-col :span="8">
+              <el-col :span="4.8">
                 <label>仓库</label>
                 <ul>
                   <li>调仓单</li>
                   <li>盘点单</li>
                   <li>报损单</li>
+                </ul>
+              </el-col>
+              <el-col :span="4.8">
+                <label>生产</label>
+                <ul>
+                  <li>生产计划单</li>
+                  <li>生产领料</li>
+                  <li>生产退料</li>
+                  <li>成品入库</li>
+                  <li>成品退库</li>
                 </ul>
               </el-col>
             </el-row>
@@ -186,17 +243,31 @@
               <li><a>切换账套</a></li>
           </el-popover>
         </el-aside>
-        <el-main style="padding:0 0 0 5px;">
-          <el-tabs v-model="tabsValue" type="card" @tab-remove="removeTab" @tab-click="tabClick" class="tabs">
+        <el-main style="padding:0;overflow:hidden;">
+          <el-tabs v-model="tabsValue" @tab-remove="removeTab" @tab-click="tabClick" class="tabs">
             <el-tab-pane
               :key="key"
               v-for="(item, key) in tabs"
               :label="item.title"
               :name="key"
               :closable="item.closable"
-              ref="tabPane"
               :src="item.src"
             >
+              <span slot="label" v-if="key==='index'"><i class="el-icon-fant-homepage"></i> 首页</span>
+            </el-tab-pane>
+            <el-tab-pane key="action" name="action" disabled style="padding:0;">
+                <span slot="label">
+                  <el-dropdown trigger="click" @command="handleCommand">
+                    <span class="el-dropdown-link">
+                      <i class="el-icon-fant-unfold" style="padding:10px 6px;"></i>
+                    </span>
+                    <el-dropdown-menu slot="dropdown">
+                      <el-dropdown-item command="1">关闭</el-dropdown-item>
+                      <el-dropdown-item command="2">关闭其他</el-dropdown-item>
+                      <el-dropdown-item command="3">关闭全部</el-dropdown-item>
+                    </el-dropdown-menu>
+                  </el-dropdown>
+                </span>
             </el-tab-pane>
           </el-tabs>
           <iframe name="inIframe" class="inIframe" src="/#/main"></iframe>
@@ -206,7 +277,6 @@
   </div>
 </template>
 <script>
-  import Vue from 'vue';
   export default {
     data () {
       return {
@@ -252,22 +322,24 @@
         }
         this.tabsValue = activeName;
         delete this.tabs[targetName];
-        Vue.arrayRemove($child.mytabs,targetName);
+        this.$arrayRemove($child.mytabs,targetName);
       },
-      tabOpen:function(){
+      tabOpen:function(e){
+        var src = e.target.attributes.src.nodeValue;
+        var title = e.target.attributes.name.nodeValue;
         var vm = this;
         var $child = window.frames["inIframe"].$vueEl.$children[0];
-        $child.$router.push("/main/test",function(router){
+        $child.$router.push(src,function(router){
           var name = router.matched[router.matched.length-1].components.default.name;
           $child.mytabs.push(name);
           vm.tabsValue = name;
           vm.tabs[name] = {
-            title: '示例',
+            title: title,
             closable:true,
-            src:"/main/test"
+            src:src
           };
         });
-        var $pop = Vue.getEl(".meanPop")
+        var $pop = this.$getEl(".meanPop")
         for(var i=0; i<$pop.length; i++){
           $pop[i].style["display"] = "none";
         }

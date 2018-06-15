@@ -390,7 +390,7 @@ var elementTemp = {
         type: Object,
         required:true
       },
-      beforeCloses:{
+      beforeClose:{
         type: Object
       }
     },
@@ -429,6 +429,7 @@ var elementTemp = {
       var opt_ = {
         title:s.title?s.title:"提示",
         width:s.width?s.width:"50%",
+        modalAppendToBody:typeof s.modalAppendToBody === "boolean"?s.modalAppendToBody:true,
         closeonclickmodal:false,
         closeonpressescape:false
       };
@@ -576,6 +577,12 @@ var elementTemp = {
         type: Object,
         required:true
       },
+      data:{
+        type:Array,
+        default:function(){
+          return [];
+        }
+      },
       beforeFilter:{
         type: Function
       },
@@ -604,7 +611,7 @@ var elementTemp = {
       activeItemChange:function(arr){
         this.$emit('active-item-change',arr);
       },
-      reloadData:function(data){
+      reload:function(data){
         if(!this.opt.url){
           return false;
         }
@@ -616,7 +623,9 @@ var elementTemp = {
           data:data,
           success:function(re){
             if(vm.dataProp.data == ""){
-              Vue.set(vm.opt,"data",re[0].children);
+              Vue.set(vm,"data",re);
+            }else{
+              Vue.set(vm,"data",re[vm.dataProp.data]);
             }
           }
         });
@@ -624,13 +633,14 @@ var elementTemp = {
     },
     created:function(){
       this.opt.props = typeof this.opt.props === "object"?this.opt.props:{value:"id",label:"text"};
-      this.opt.data = this.opt.data?this.opt.data:[];
       this.opt.width = typeof this.opt.width === "string"?this.opt.width:typeof this.opt.width === "number"?this.opt.width+"px":"200px";
       this.opt.height = typeof this.opt.height === "string"?this.opt.height:typeof this.opt.height === "number"?this.opt.height+"px":null;
       //设置url后，data会失效
-      this.reloadData();
+      if(this.opt.url && typeof this.opt.url === "string") {
+        this.reload();
+      }
     },
-    template:'<el-cascader :style="{width:opt.width,height:opt.height}" :options="opt.data" v-model="myvalue" :props="opt.props" :popper-class="opt.popperClass" :placeholder="opt.prompt" :disabled="opt.disabled" :clearable="opt.clearable" :expand-trigger="opt.expandTrigger?opt.expandTrigger:\'click\'" :show-all-levels="opt.showAllLevels" :filterable="opt.filterable" :change-on-select="opt.changeOnSelect" :size="opt.size?opt.size:\'small\'" :before-filter="beforeFilter" @change="change" @active-item-change="activeItemChange" @blur="blur" @focus="focus"></el-cascader>'
+    template:'<el-cascader :style="{width:opt.width,height:opt.height}" :options="data" v-model="myvalue" :props="opt.props" :popper-class="opt.popperClass" :placeholder="opt.prompt" :disabled="opt.disabled" :clearable="opt.clearable" :expand-trigger="opt.expandTrigger?opt.expandTrigger:\'click\'" :show-all-levels="opt.showAllLevels" :filterable="opt.filterable" :change-on-select="opt.changeOnSelect" :size="opt.size?opt.size:\'small\'" :before-filter="beforeFilter" @change="change" @active-item-change="activeItemChange" @blur="blur" @focus="focus"></el-cascader>'
   },
   //下拉选择框封装
   selectDom : {
@@ -644,7 +654,15 @@ var elementTemp = {
     props: {
       opt: {
         type: Object,
-        required:true
+        default:function(){
+          return {};
+        }
+      },
+      data:{
+        type:Array,
+        default:function(){
+          return [];
+        }
       },
       localSearch:{
         type: Function
@@ -686,10 +704,10 @@ var elementTemp = {
           var data={};
           this.oldVal = query;
           data[key] = query;
-          this.reloadData(data);
+          this.reload(data);
         }
       },
-      reloadData:function(data){
+      reload:function(data){
         if(!this.opt.url){
           return false;
         }
@@ -701,9 +719,9 @@ var elementTemp = {
           data:data,
           success:function(re){
             if(vm.dataProp.data == ""){
-              Vue.set(vm.opt,"data",re);
+              Vue.set(vm,"data",re);
             }else{
-              Vue.set(vm.opt,"data",re[vm.dataProp.data]);
+              Vue.set(vm,"data",re[vm.dataProp.data]);
             }
           }
         });
@@ -732,12 +750,14 @@ var elementTemp = {
       var panel = this.$el.getElementsByClassName("el-popper")[0];
       panel.style.width = this.opt.panelWidth;
       //设置url后，data会失效
-      this.reloadData();
+      if(this.opt.url && typeof this.opt.url === "string") {
+        this.reload();
+      }
       var $input = this.$el.getElementsByTagName("input")[0];
       //将vue对象绑定在input里面
       $input.vueEl = this;
     },
-    template:'<el-select :disabled="opt.disabled" :style="{width:opt.width,height:opt.height}" :name="opt.name" :remote="opt.remote" :clearable="opt.clearable" :size="opt.size?opt.size:\'small\'" :value="value" @change="change" @focus="focus" @blur="blur"  @visible-change="visibleChange" @remove-tag="removeTag" @clear="clear" @input="updateValue" :multiple="opt.multiple" popper-class="selectMain" :filterable="opt.filterable" :filter-method="localSearch" :remote-method="remoteSearch" :placeholder="opt.prompt"><el-option :disabled="true" value="0"><span v-for="val in opt.columns" :style="{ display: \'inline-block\',width: val.width + \'%\' }">{{val.name}}</span></el-option><el-option :disabled="item.disabled" v-for="item in opt.data" :label="item[opt.textField]" :value="item[opt.idField]"><span :style="{ display: \'inline-block\',width: val.width + \'%\' }" v-for="val in opt.columns">{{item[val.key]}}</span></el-option></el-select>',
+    template:'<el-select :disabled="opt.disabled" :style="{width:opt.width,height:opt.height}" :name="opt.name" :remote="opt.remote" :clearable="opt.clearable" :size="opt.size?opt.size:\'small\'" :value="value" @change="change" @focus="focus" @blur="blur"  @visible-change="visibleChange" @remove-tag="removeTag" @clear="clear" @input="updateValue" :multiple="opt.multiple" popper-class="selectMain" :filterable="opt.filterable" :filter-method="localSearch" :remote-method="remoteSearch" :placeholder="opt.prompt"><el-option :disabled="true" value="0"><span v-for="val in opt.columns" :style="{ display: \'inline-block\',width: val.width + \'%\' }">{{val.name}}</span></el-option><el-option :disabled="item.disabled" v-for="item in data" :label="item[opt.textField]" :value="item[opt.idField]"><span :style="{ display: \'inline-block\',width: val.width + \'%\' }" v-for="val in opt.columns">{{item[val.key]}}</span></el-option></el-select>',
   },
   //form封装
   formDom : {
@@ -826,14 +846,19 @@ var elementTemp = {
     props: {
       opt: {
         type: Object,
-        required:true
+        default:function(){
+          return {};
+        }
       },
       columns: {
         type: Array,
         required:true
       },
       page: {
-        type: Object
+        type: Object,
+        default:function(){
+          return {};
+        }
       },
       data:{
         type: Array,
@@ -895,7 +920,7 @@ var elementTemp = {
           var page_ = {};
           page_[this.pageProp.currentPage] = 1;
           page_[this.pageProp.pageSize] = pagesize;
-          this.reloadGrid(page_);
+          this.reload(page_);
         }
         this.$emit('size-change', pagesize);
       },
@@ -905,7 +930,7 @@ var elementTemp = {
           var page_ = {};
           page_[this.pageProp.currentPage] = page;
           page_[this.pageProp.pageSize] = this.page.pageSize;
-          this.reloadGrid(page_);
+          this.reload(page_);
         }
         this.$emit('page-change', page);
       },
@@ -949,9 +974,9 @@ var elementTemp = {
         var page_ = {};
         page_[this.pageProp.currentPage] = this.page.currentPage;
         page_[this.pageProp.pageSize] = this.page.pageSize;
-        this.reloadGrid(page_);
+        this.reload(page_);
       },
-      reloadGrid:function(data){
+      reload:function(data){
         if(!this.opt.url){
           return false;
         }
@@ -962,7 +987,11 @@ var elementTemp = {
           method:this.opt.method?this.opt.method:"post",
           data:data,
           success:function(re){
-            vm.mydata = re[vm.dataProp.data];
+            if(vm.dataProp.data == ""){
+              Vue.set(vm,"myata",re);
+            }else{
+              Vue.set(vm,"mydata",re[vm.dataProp.data]);
+            }
             Vue.set(vm.page,"total",re[vm.dataProp.total]);
           }
         });
@@ -983,18 +1012,20 @@ var elementTemp = {
         this.opt.width = typeof this.opt.width === "string" || typeof this.opt.width === "number"?this.opt.width:"100%";
         // this.opt.height = typeof this.opt.height === "string" || typeof this.opt.height === "number"?this.opt.height:"500px";
         typeof this.opt.height === "number"?this.opt.height=this.opt.height+"px":null;
+        typeof this.opt.cellStyle === "object"?(this.opt.cellStyle = Vue.assign({overflow:'hidden'},this.opt.cellStyle)):null;
+        this.opt.stripe = typeof this.opt.stripe === "boolean"?this.opt.stripe:true;
       }
     },
     mounted:function(){
       //设置url后，data会失效
       if(this.opt.url && typeof this.opt.url === "string"){
-        this.reloadGrid();
+        this.reload();
       }
       if(this.$slots.append){
         this.$el.getElementsByClassName("el-table__empty-block")[0].style.display="none";
       }
     },
-    template:'<div class="fTable" :style="{height:opt.height,width:opt.width,position:\'relative\'}"><el-table ref="elTable" :sum-text="opt.sumText" tooltip-effect="dark" :cell-style="{overflow:\'hidden\'}" row-class-name="ops-table-row" cell-class-name="ops-table-cell" header-row-class-name="f-table-header-row" header-cell-class-name="f-table-header-cell" @select="select" @select-all="selectAll" @selection-change="selectionChange" @cell-mouse-enter="cellMouseEnter" @cell-mouse-leave="cellMouseLeave" @cell-click="cellClick" @cell-dblclick="cellDblclick" @row-click="rowClick" @row-contextmenu="rowContextmenu" @row-dblclick="rowDblclick" @sort-change="sortChange" @header-dragend="headerDragend" :data="mydata" :size="opt.size?opt.size:\'small\'" :show-summary="opt.showSummary" :summary-method="getSummaries" :highlight-current-row="true" :border="opt.border" stripe height="calc(100% - 32px)" :style="{width: opt.width}" @current-change="currentChange"><el-table-column v-if="opt.multiple" type="selection" width="55"></el-table-column><el-table-column v-for="(col, i) of columns" :type="col.type" :index="col.index" :resizable="col.resizable" align="center" header-align="center" :show-overflow-tooltip="true" :selectable="col.selectable" :reserve-selection="col.reserveSelection" :sort-by="col.sortBy" :prop="col.prop" :label="col.label" :fixed="col.fixed" :sortable="col.sortable" :min-width="col.minWidth" :width="col.width"><template slot-scope="scope"><slot :name="col.prop" :row="scope.row" :column="scope.column" :$index="scope.$index">{{col.formatter?col.formatter(scope.row, scope.column, scope.row[col.prop]):typeof col.money === "boolean"&&col.money?formatMoney(scope.row[col.prop]):scope.row[col.prop]}}</slot></template></el-table-column><div slot="append" v-if="$slots.append"><slot name="append"></slot></div></el-table><el-pagination v-if="opt.page" background layout="total, sizes, prev, pager, next, jumper, slot" @size-change="sizeChange" :current-page="page.currentPage" ref="elPage" :page-sizes="[10, 20, 30, 40]" :page-size="page.pageSize" :total="page.total" @next-click="nextClick" @prev-click="prevClick" @current-change="pageChange"><div slot style="display:inline-block;"><el-button v-if="page.ref" type="primary" @click="refresh" plain icon="el-icon-d-arrow-right"></el-button></div></el-pagination></div>'
+    template:'<div class="fTable" :style="{height:opt.height,width:opt.width,position:\'relative\',\'border-top\':\'1px solid #ccc\'}"><el-table ref="elTable" :sum-text="opt.sumText" tooltip-effect="dark" :cell-style="opt.cellStyle" row-class-name="\'f-table-row \'+opt.rowClassName" cell-class-name="\'f-table-cell \'+opt.cellClassName" header-row-class-name="\'f-table-header-row \'+opt.headerRowClassName" header-cell-class-name="\'f-table-header-cell \'+opt.headerCellClassName" @select="select" @select-all="selectAll" @selection-change="selectionChange" @cell-mouse-enter="cellMouseEnter" @cell-mouse-leave="cellMouseLeave" @cell-click="cellClick" @cell-dblclick="cellDblclick" @row-click="rowClick" @row-contextmenu="rowContextmenu" @row-dblclick="rowDblclick" @sort-change="sortChange" @header-dragend="headerDragend" :data="mydata" :size="opt.size?opt.size:\'small\'" :show-summary="opt.showSummary" :summary-method="getSummaries" :highlight-current-row="true" :border="opt.border" :stripe="opt.stripe" height="calc(100% - 40px)" :style="{width: opt.width}" @current-change="currentChange"><el-table-column v-if="opt.multiple" type="selection" width="55"></el-table-column><el-table-column v-for="(col, i) of columns" :type="col.type" :index="col.index" :resizable="col.resizable" align="center" header-align="center" :show-overflow-tooltip="true" :selectable="col.selectable" :reserve-selection="col.reserveSelection" :sort-by="col.sortBy" :prop="col.prop" :label="col.label" :fixed="col.fixed" :sortable="col.sortable" :min-width="col.minWidth" :width="col.width"><template slot-scope="scope"><slot :name="col.prop" :row="scope.row" :column="scope.column" :$index="scope.$index">{{col.formatter?col.formatter(scope.row, scope.column, scope.row[col.prop]):typeof col.money === "boolean"&&col.money?formatMoney(scope.row[col.prop]):scope.row[col.prop]}}</slot></template></el-table-column><div slot="append" v-if="$slots.append"><slot name="append"></slot></div></el-table><el-pagination v-if="opt.page" background layout="total, sizes, prev, pager, next, jumper, slot" @size-change="sizeChange" :current-page="page.currentPage" ref="elPagination" :page-sizes="[10, 20, 30, 40]" :page-size="page.pageSize" :total="page.total" @next-click="nextClick" @prev-click="prevClick" @current-change="pageChange"><div slot style="display:inline-block;"><el-button v-if="page.ref" type="primary" @click="refresh" plain icon="el-icon-d-arrow-right"></el-button><slot name="pageSlot"></slot></div></el-pagination></div>'
   },
   //tooltip封装
   tipsDom : {
@@ -1014,6 +1045,7 @@ var elementTemp = {
 var fantVueElement = {};
 fantVueElement.install = function (Vue, options) {
   Vue.keyHandler = keyHandler;
+  Vue.prototype.$keyHandler = keyHandler;
   //注入组件
   Vue.mixin({
     methods:{
@@ -1048,10 +1080,10 @@ fantVueElement.install = function (Vue, options) {
           var second = opt.timeout/1000;
           opt.msg = opt.msg+"<span class='opsTimeout' ref='opsTimeout'>"+second+"秒后关闭</span>";
           var t = second-1;
-          var t1 =setInterval(function(){$(".opsTimeout")[0].innerHTML = (t--)+"秒后关闭";},1000);
+          var t1 =setInterval(function(){Vue.getEl(".opsTimeout")[0].innerHTML = (t--)+"秒后关闭";},1000);
           setTimeout(function(){
             clearInterval(t1);
-            $(".el-aaa-box__wrapper")[0].getElementsByClassName('el-aaa-box__headerbtn')[0].click();
+            Vue.getEl(".el-aaa-box__wrapper")[0].getElementsByClassName('el-aaa-box__headerbtn')[0].click();
           },opt.timeout);
         }
         this.$alert(opt.msg, opt.title, opt);

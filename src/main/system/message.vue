@@ -116,8 +116,7 @@
 </template>
 
 <script>
-  import Vue from "vue";
-  import valid from '../lib/validate';
+  import valid from '@/lib/validate';
   export default {
     name:"message",
     data () {

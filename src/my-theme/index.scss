@@ -5,3 +5,12 @@ $--font-path: '~element-ui/lib/theme-chalk/fonts';
 .el-dialog__body{
   padding:10px;
 }
+.treebox-selected{
+  background:$--color-primary;
+}
+.fant-help-btn{
+  position:absolute;
+  bottom:80px;
+  width:100%;
+  text-align:center;
+}

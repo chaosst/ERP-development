@@ -4,7 +4,7 @@
     min-width:350px;
   }
   #loginBox{
-    background:url(../assets/images/login.jpeg) center center no-repeat;
+    background:url(~assets/images/login.jpeg) center center no-repeat;
     background-size:100%;
     width:100%;
     height:100%;
@@ -77,7 +77,6 @@
 </template>
 
 <script>
-  import Vue from "vue";
   export default {
     data () {
       return {
