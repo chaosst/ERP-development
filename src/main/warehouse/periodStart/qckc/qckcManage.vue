@@ -20,6 +20,7 @@
     font-size:14px;
   }
   .searchBar{
+    font-size:14px;
     float:right;
     line-height: 40px;
     margin-right: 10px;
@@ -91,17 +92,25 @@
           </el-input>
         </f-form-item>
         <f-form-item class="inputItem" :opt="{label:'单据日期：',prop:'billDate'}">
-          <tips value="选择日期">
             <datebox
               v-model="formData.billDate"
               :opt="dateOpt"
-              @change="myclose"
+              @change="changeDate"
               style="width:200px;">
             </datebox>
-          </tips>
         </f-form-item>
-        <f-form-item class="inputItem" :opt="{label:'采购员：',prop:'inMemberId'}">
-          <f-select :opt="selectOpt" :data="adata" v-model="formData.inMemberId" @visible-change="myclose"></f-select>
+        <f-form-item class="inputItem" :opt="{label:'仓库：',prop:'inMemberId'}">
+          <treebox :opt="warehouseOpt" v-model="formData.warehouseId"></treebox>
+        </f-form-item>
+        <f-form-item class="inputItem" :opt="{label:'货品：',prop:'goodsId'}">
+          <f-select :opt="goodsOpt" v-model="formData.goodsId"></f-select>
+        </f-form-item>
+        <f-form-item class="inputItem" :opt="{labelWidth:'0px',prop:'recordStatus'}">
+          <el-radio-group v-model="formData.recordStatus">
+            <el-radio label="0">未审核</el-radio>
+            <el-radio label="1">已审核</el-radio>
+            <el-radio label="2">已作废</el-radio>
+          </el-radio-group>
         </f-form-item>
         <div>
           <el-button type="primary" size="mini" style="width:90%;margin: 5px 5%;" @click="searchTable">查询</el-button>
@@ -110,13 +119,7 @@
       </f-form>
     </el-popover>
     <win :show.sync="winShow" :opt="winOpt">
-      <keep-alive>
-        <router-view style="width:100%;height:100%;"></router-view>
-      </keep-alive>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="outerVisible = false">取 消</el-button>
-        <el-button type="primary" @click="innerVisible = true">打开内层 Dialog</el-button>
-      </div>
+        <router-view style="width:100%;height:100%;float:left;"></router-view>
     </win>
   </div>
 </template>
@@ -148,7 +151,16 @@
 
         },
         dateOpt:{
-          prompt:"请选择日期"
+          prompt:"请选择日期",
+          type:"daterange"
+        },
+        warehouseOpt:{
+          placeholder:"请选择仓库",
+          url:""
+        },
+        goodsOpt:{
+          placeholder:"请选择货品",
+          url:""
         },
         selectFid:"",
         mydata:adata,
@@ -170,15 +182,11 @@
         },
         columns:[
           {prop:"code",label:"单号",minWidth:"150"},
+          {prop:"voucherCode",label:"原始单号",minWidth:"150"},
+          {prop:"warehouse",label:"仓库",minWidth:"150"},
           {prop:"billDate",label:"单据日期",minWidth:"150",formatter:function(row, column, cellValue){
             return vm.formatDate(row, column, cellValue);
           }},
-          {prop:"supplierName",label:"供应商",minWidth:"100"},
-          {prop:"inMemberName",label:"采购员",minWidth:"80"},
-          {prop:"totalAmount",label:"金额",minWidth:"100",money:true},
-          {prop:"totalPayAmount",label:"付款金额",minWidth:"100",money:true},
-          {prop:"freeAmount",label:"优惠金额",minWidth:"100",money:true},
-          {prop:"creatorName",label:"制单人",minWidth:"100"},
           {prop:"recordStatus",label:"状态",minWidth:"80",formatter:function(row, column, cellValue){
             return vm.recordFormat(row, column, cellValue);
           }}
@@ -218,7 +226,10 @@
         //window.parent.vm
         console.log(a)
       },
-
+      changeDate(value){
+        this.formData.startDate = value[0];
+        this.formData.endDate = value[1];
+      },
       changepage(index){
         this.$http.post("warehouse/cgrk/list",{page:index}).then(function(re){
           if(re.body.rows){
@@ -317,7 +328,7 @@
       },
       addBox:function(){
         this.selectFid = "";
-        this.$router.push("/main/putInStorage/edit");
+        this.$router.push("/main/qckc/edit");
         this.winShow = true;
       }
     },

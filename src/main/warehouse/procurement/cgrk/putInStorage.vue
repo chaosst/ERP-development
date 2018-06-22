@@ -86,14 +86,11 @@
           </el-input>
         </f-form-item>
         <f-form-item class="inputItem" :opt="{label:'单据日期：',prop:'billDate'}">
-          <tips value="选择日期">
             <datebox
               v-model="formData.billDate"
               :opt="dateOpt"
-              @change="myclose"
               style="width:200px;">
             </datebox>
-          </tips>
         </f-form-item>
         <f-form-item class="inputItem" :opt="{label:'采购员：',prop:'inMemberId'}">
           <f-select :opt="selectOpt" :data="adata" v-model="formData.inMemberId" @visible-change="myclose"></f-select>
@@ -142,7 +139,8 @@
 
         },
         dateOpt:{
-          prompt:"请选择日期"
+          prompt:"请选择日期",
+          type:"daterange"
         },
         selectFid:"",
         mydata:adata,

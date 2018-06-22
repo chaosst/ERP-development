@@ -1,4 +1,15 @@
+<style>
+  .el-form-item__error{
+    float:left;
+    position:fixed;
+    display:block;
+    z-index:10000;
+  }
+</style>
 <style scoped>
+  .warehouseBox{
+    height:calc(100% - 10px) !important;
+  }
   .warehouseMain{
     width:100%;
     height:calc(100% - 50px) !important;
@@ -6,6 +17,7 @@
     background:#fff;
     border:1px solid #c5c5c5;
     border-radius:6px;
+    margin-top:10px;
   }
   .warehouseBox .editHeader{
     border-bottom:1px solid #ddd;
@@ -66,7 +78,7 @@
     <el-row class="editHeader">
       <el-col :span="6" class="titleBar">
         <el-button circle icon="el-icon-fant-return" class="miniBtn" type="primary" size="mini" @click="close"></el-button>
-        <div class="title">采购入库单据</div>
+        <div class="title">期初库存单据</div>
       </el-col>
       <el-col :span="18" class="editBase">
         <span>单号：{{editData.code}}</span>
@@ -76,46 +88,23 @@
       <div class="mainBox">
         <el-row>
           <el-col :span="8">
-            <el-form-item class="inputItem"  label="单据日期：" prop="billDate">
-              <datebox v-model="editData.billDate" :opt="editDateOpt" style="width:90%;"></datebox>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item class="inputItem"  label="供应商：" prop="supplierId">
-              <f-select :opt="supOpt" v-model="editData.supplierId" style="width:90%;"></f-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item class="inputItem"  label="采购员：" prop="inMemberId">
-              <f-select :opt="memOpt" v-model="editData.inMemberId" @visible-change="myclose" style="width:90%;"></f-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="8">
             <el-form-item class="inputItem" label="原始单号：" prop="voucherCode">
-              <el-input v-model="editData.voucherCode" placeHolder="原始单号" style="width:90%;"></el-input>
+              <el-input v-model="editData.voucherCode" placeHolder="原始单号" style="width:100%;"></el-input>
             </el-form-item>
           </el-col>
           <el-col :span="8">
-            <el-form-item class="inputItem"  label="计划入仓日期：" prop="endDate">
-              <datebox v-model="editData.endDate" :opt="endDateOpt" style="width:90%;"></datebox>
-            </el-form-item>
-          </el-col>
-          <el-col :span="8">
-            <el-form-item class="inputItem"  label="入仓仓库：" prop="inWareHouseId">
-              <cascader
+            <el-form-item class="inputItem"  label="仓库：" prop="inWareHouseId">
+              <treebox
                 :opt="casOpt"
-                :data="[]"
-                v-model="editData.inWareHouseId" style="width:90%;">
-              </cascader>
+                v-model="editData.inWareHouseId">
+              </treebox>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="16">
             <el-form-item class="inputItem" label="备注：" prop="describe">
-              <el-input v-model="editData.describe" placeHolder="备注" style="width:90%;"></el-input>
+              <el-input v-model="editData.describe" placeHolder="备注" style="width:calc(100%);"></el-input>
             </el-form-item>
           </el-col>
           <el-button type="info" size="mini" circle :class="infoBtnClass" @click="showDetail"></el-button>
@@ -125,18 +114,35 @@
         <div class="mainBox" v-show="boxHide" style="margin-top:10px;">
           <el-row>
             <el-col :span="8">
-              <el-form-item class="inputItem" label="部门：">
-                {{editData.deptName}}
+              <el-form-item class="inputItem" label="制单人：">
+                {{editData.creatorName}}
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item class="inputItem" label="供应商编号：">
-                {{editData.supplierCode}}
+              <el-form-item class="inputItem" label="制单时间：">
+                {{editData.createTime}}
               </el-form-item>
             </el-col>
             <el-col :span="8">
-              <el-form-item class="inputItem" label="合计金额：">
-                {{editData.totalAmount}}
+              <el-form-item class="inputItem" label="审核人：">
+                {{editData.auditorName}}
+              </el-form-item>
+            </el-col>
+          </el-row>
+          <el-row>
+            <el-col :span="8">
+              <el-form-item class="inputItem" label="审核时间：">
+                {{editData.auditTime}}
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item class="inputItem" label="作废人：">
+                {{editData.cancelorName}}
+              </el-form-item>
+            </el-col>
+            <el-col :span="8">
+              <el-form-item class="inputItem" label="作废时间：">
+                {{editData.cancelTime}}
               </el-form-item>
             </el-col>
           </el-row>
@@ -160,7 +166,7 @@
           <template slot="inWareHouseName" slot-scope="scope">
             <table-form :scope="scope" prop="inWareHouseId">
               <div v-if="!scope.row.editKey['inWareHouseId']" @click="e=>editCell(e,'inWareHouseId',scope.$index)">{{scope.row.inWareHouseName || '&nbsp;'}}</div>
-              <cascader v-if="scope.row.editKey['inWareHouseId']" placeholder="选择仓库" :data="[]" :opt="rowOpt.warehouse" @blur="saveCell('inWareHouseId',scope.$index)" v-model="scope.row.inWareHouseId"></cascader>
+              <treebox v-if="scope.row.editKey['inWareHouseId']" :opt="rowOpt.warehouse" @blur="saveCell('inWareHouseId',scope.$index)" v-model="scope.row.inWareHouseId"></treebox>
             </table-form>
           </template>
           <template slot="goodsSpecName" slot-scope="scope">
@@ -178,19 +184,19 @@
           <template slot="quentity" slot-scope="scope">
             <table-form :scope="scope" prop="quentity">
               <div v-if="!scope.row.editKey['quentity']" @click="e=>editCell(e,'quentity',scope.$index)">{{scope.row.quentity || '&nbsp;'}}</div>
-              <el-input-number v-if="scope.row.editKey['quentity']" @blur="saveCell('quentity',scope.$index)" size="mini" :controls="false" v-model="scope.row.quentity" style="width:80%;"></el-input-number>
+              <el-input-number v-if="scope.row.editKey['quentity']" @focus="e=>calcType(e,scope.$index,'quentity')" @blur="saveCell('quentity',scope.$index)" size="mini" :controls="false" v-model="scope.row.quentity" style="width:80%;"></el-input-number>
             </table-form>
           </template>
           <template slot="unitPrice" slot-scope="scope">
             <table-form :scope="scope" prop="unitPrice">
               <div v-if="!scope.row.editKey['unitPrice']" @click="e=>editCell(e,'unitPrice',scope.$index)">{{scope.row.unitPrice || '&nbsp;'}}</div>
-              <el-input-number v-if="scope.row.editKey['unitPrice']" size="mini" @blur="saveCell('unitPrice',scope.$index)" :controls="false" v-model="scope.row.unitPrice" style="width:80%;"></el-input-number>
+              <el-input-number v-if="scope.row.editKey['unitPrice']" @focus="e=>calcType(e,scope.$index,'unitPrice')" size="mini" @blur="saveCell('unitPrice',scope.$index)" :controls="false" v-model="scope.row.unitPrice" style="width:80%;"></el-input-number>
             </table-form>
           </template>
           <template slot="type" slot-scope="scope">
             <table-form :scope="scope" prop="type">
               <div v-if="!scope.row.editKey['type']" @click="e=>editCell(e,'type',scope.$index)">{{scope.row.type || '&nbsp;'}}</div>
-              <div v-if="scope.row.editKey['type']"><el-input-number size="mini" @blur="saveCell('type',scope.$index)" :controls="false" v-model="scope.row.type" style="width:80%;"></el-input-number></div>
+              <div v-if="scope.row.editKey['type']"><el-input-number size="mini" @focus="e=>calcType(e,scope.$index,'type')" @blur="saveCell('type',scope.$index)" :controls="false" v-model="scope.row.type" style="width:80%;"></el-input-number></div>
             </table-form>
           </template>
           <template slot="describe" slot-scope="scope">
@@ -242,6 +248,8 @@
           goodsCode:{
           },
           warehouse:{
+            url:"",
+            placeholder:"请选择仓库"
           },
           spec:{
           },
@@ -261,8 +269,8 @@
           showSummary:true
         },
         casOpt:{
-//          url:"storehouses/getTreeOfEnable",
-          changeOnSelect:true,
+          url:"",
+          width:"100%"
         },
         columns:[
           {prop:"goodsCode",label:"编号",minWidth:"100",rules:[
@@ -326,12 +334,41 @@
       console.log("传入的FID："+this.fid);
     },
     methods:{
+      calcType(e,index,name){
+        e.target.addEventListener("input",()=>{
+          var value = e.target.value;
+          if(name === "quentity"){
+            if(value===""){
+              this.$set(this.mydata[index],"type","");
+              return false;
+            }
+            var unitPrice = this.mydata[index].unitPrice?this.mydata[index].unitPrice:0;
+            this.$set(this.mydata[index],"type",unitPrice*value);
+          }else if(name === "unitPrice"){
+            if(value===""){
+              this.$set(this.mydata[index],"type","");
+              return false;
+            }
+            var quentity = this.mydata[index].quentity?this.mydata[index].quentity:0;
+            this.$set(this.mydata[index],"type",quentity*value);
+          }else if(name === "type"){
+            if(value===""){
+              this.$set(this.mydata[index],"unitPrice","");
+              return false;
+            }
+            if(this.mydata[index].quentity){
+              var quentity = this.mydata[index].quentity;
+              this.$set(this.mydata[index],"unitPrice",value/quentity);
+            }
+          }
+        });
+      },
       myclose:function(val){
         console.log(val);
       },
       close:function(){
         window.$vueParentEl.winShow=false;
-        this.$router.push("/main/putInStorage");
+        this.$router.push("/main/qckc");
       },
       showDetail:function(){
         if(!this.boxHide){

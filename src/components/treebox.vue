@@ -2,9 +2,13 @@
   .elInput.el-input--prefix >>> .el-input__inner {
     padding-left: 85px;
   }
+  .treebox{
+    display: inline-block;
+    position: relative;
+  }
 </style>
 <template>
-  <div>
+  <div class="treebox">
       <el-popover
         placement="bottom"
         @show="show"
@@ -215,14 +219,14 @@
       }
     },
     created(){
-      this.opt.size = this.opt.size?this.opt.size:"mini";
+      this.opt.size = this.opt.size?this.opt.size:"small";
       this.opt.clearable = typeof this.opt.clearable === "boolean"?this.opt.clearable:true;
       this.opt.emptyText = this.opt.emptyText?this.opt.emptyText:"没有数据";
       this.opt.props = this.opt.props?this.opt.props:{children: 'children', label: 'label'};
       this.opt.nodeKey = this.opt.nodeKey?this.opt.nodeKey:"id";
       this.opt.defaultExpandAll = typeof this.opt.defaultExpandAll === "boolean"?this.opt.defaultExpandAll:true;
 
-      this.opt.width = typeof this.opt.width === "string"?this.opt.width:typeof this.opt.width === "number"?this.opt.width+"px":"200px";
+      this.opt.width = typeof this.opt.width === "string"?this.opt.width:typeof this.opt.width === "number"?this.opt.width+"px":null;
       this.opt.panelWidth = typeof this.opt.panelWidth === "string"?this.opt.panelWidth:typeof this.opt.panelWidth === "number"?this.opt.panelWidth+"px":null;
       this.opt.panelHeight = typeof this.opt.panelHeight === "string"?this.opt.panelHeight:typeof this.opt.panelHeight === "number"?this.opt.panelHeight+"px":null;
       this.opt.highlightCurrent = true;
